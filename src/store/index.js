@@ -5,6 +5,7 @@ import * as firebase from "firebase";
 Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
+    user: null,
     teachers: [
       {
         teachersid: "121",
@@ -81,7 +82,11 @@ export const store = new Vuex.Store({
     ],
     goToTeacher: {}
   },
-  mutations: {},
+  mutations: {
+    setUser(state, payload) {
+      state.user = payload;
+    }
+  },
   actions: {
     uploadFirebase(state, payload) {
       firebase
@@ -98,6 +103,62 @@ export const store = new Vuex.Store({
           state.goToTeacher = [data];
         }
       });
+    },
+    signUserUp({ commit }, payload) {
+      commit("setLoading", true);
+      commit("clearError");
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(payload.email, payload.password)
+        .then(user => {
+          commit("setLoading", false);
+          const newUser = {
+            id: user.user.uid
+          };
+          commit("setUser", newUser);
+        })
+        .catch(error => {
+          commit("setLoading", false);
+          commit("setError", error);
+        });
+    },
+    signUserIn({ commit }, payload) {
+      commit("setLoading", true);
+      commit("clearError");
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(payload.email, payload.password)
+        .then(user => {
+          commit("setLoading", false);
+          const newUser = {
+            id: user.user.uid
+          };
+          commit("setUser", newUser);
+        })
+        .catch(error => {
+          commit("setLoading", false);
+          commit("setError", error);
+        });
+    },
+    userProfileData({ state }, Username) {
+      var user = firebase.auth().currentUser;
+      user
+        .updateProfile({
+          displayName: Username
+        })
+        .then(() => {
+          state.user.displayName = Username;
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+    autoSignIn({ commit }, payload) {
+      commit("setUser", {});
+    },
+    logout({ commit }) {
+      firebase.auth().signOut();
+      commit("setUser", null);
     }
   },
   getters: {
@@ -106,6 +167,9 @@ export const store = new Vuex.Store({
     },
     getTeacher(state) {
       return state.goToTeacher;
+    },
+    user(state) {
+      return state.user;
     }
   }
 });

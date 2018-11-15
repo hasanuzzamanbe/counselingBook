@@ -1,5 +1,5 @@
 <template>
-    <div id="app" style="max-width:1785px">
+    <div id="app" style="max-width:1785px;margin-top: -31px;">
         <AppHeader/>
         <!-- <img src="./assets/logo.png"> -->
         <router-view/>
@@ -28,5 +28,12 @@ export default {
   color: #2c3e50;
   margin-top: -5px;
   padding-top: 23px;
+}
+@media only screen and (min-width: 600px) {
+  .mainDivTemplate {
+    padding-right: 106px;
+    padding-left: 106px;
+    padding-top: 16px;
+  }
 }
 </style>

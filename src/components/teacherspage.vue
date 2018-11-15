@@ -114,6 +114,9 @@ export default {
     sendRequest() {
       console.log(this.counselingDetails);
     }
+  },
+  mounted: function() {
+    this.$store.dispatch("teachersPage", this.ID);
   }
 };
 </script>

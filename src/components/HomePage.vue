@@ -58,7 +58,6 @@ export default {
     },
     gotoTeacher(teacherID) {
       this.$store.dispatch("teachersPage", teacherID);
-      console.log(teacherID);
     },
     toRouteTeacher(teacherID) {
       let path = "/teacher/" + teacherID;

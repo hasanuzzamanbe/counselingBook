@@ -2,15 +2,34 @@
     <div>
         <el-row>
             <el-col :span="6">
-                <div class="grid-content bg-purple">
-                    <el-tabs :tab-position="tabPosition" style="height: 200px;">
-                        <el-tab-pane label="Profile">Profile</el-tab-pane>
-                        <el-tab-pane label="Log out">Log out</el-tab-pane>
-                        <el-tab-pane label="Teachers">Teachers</el-tab-pane>
-                        <el-tab-pane label="Schedules">Schedules</el-tab-pane>
-                        <el-tab-pane label="My schedules">My schedules</el-tab-pane>
-                    </el-tabs>
-                </div>
+                <el-menu>
+                    <el-submenu index="1" v-if="!userIsAuthenticated">
+                        <template slot="title">
+                            <i class="el-icon-menu"></i>
+                            <span slot="title">Profile</span>
+                        </template>
+                        <el-menu-item-group>
+                            <el-menu-item index="1-1" @click="profilePage">Edit User</el-menu-item>
+                            <el-menu-item index="1-2">Log-out</el-menu-item>
+                        </el-menu-item-group>
+                    </el-submenu>
+                    <el-menu-item index="2" @click="TeachersPage">
+                        <i class="el-icon-menu"></i>
+                        <span slot="title">Teachers</span>
+                    </el-menu-item>
+                    <el-menu-item index="3">
+                        <i class="el-icon-document"></i>
+                        <span slot="title">Schedules</span>
+                    </el-menu-item>
+                    <el-menu-item index="4" v-if="!userIsAuthenticated" @click="SignInPage">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">sign In</span>
+                    </el-menu-item>
+                    <el-menu-item index="5" v-if="!userIsAuthenticated" @click="SignUpPage">
+                        <i class="el-icon-setting"></i>
+                        <span slot="title">sign up</span>
+                    </el-menu-item>
+                </el-menu>
             </el-col>
             <el-col :span="18">
                 <img src="@/assets/caroseul1c.jpg" alt="">
@@ -20,12 +39,34 @@
 </template>
 <script>
 export default {
+  props: ["ID"],
   data() {
     return {
       tabPosition: "left"
     };
   },
-  methods: {}
+  computed: {
+    userIsAuthenticated() {
+      return (
+        this.$store.getters.user !== null &&
+        this.$store.getters.user !== undefined
+      );
+    }
+  },
+  methods: {
+    TeachersPage() {
+      this.$router.push("/");
+    },
+    SignInPage() {
+      this.$router.push("/signin");
+    },
+    SignUpPage() {
+      this.$router.push("/signup");
+    },
+    profilePage() {
+      this.$router.push("/profile");
+    }
+  }
 };
 </script>
 <style scoped>
@@ -37,5 +78,8 @@ export default {
 .el-tabs__content {
   color: darkred;
   font-family: cursive;
+}
+.el-menu {
+  background-color: #fbfafa;
 }
 </style>
