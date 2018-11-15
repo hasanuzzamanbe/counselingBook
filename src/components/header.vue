@@ -24,7 +24,8 @@ export default {
     return {
       tabPosition: "left"
     };
-  }
+  },
+  methods: {}
 };
 </script>
 <style scoped>

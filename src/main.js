@@ -7,7 +7,11 @@ import App from "./App";
 import router from "./router";
 import { store } from "./store";
 import * as firebase from "firebase";
-Vue.use(ElementUI);
+
+import locale from "element-ui/lib/locale/lang/en";
+
+Vue.use(ElementUI, { locale });
+
 Vue.config.productionTip = false;
 
 /* eslint-disable no-new */

@@ -24,7 +24,11 @@ i
                         <p>Subject:{{t.subject}}</p>
                         <div class="bottom clearfix">
                             <time class="time">{{ t.time }}</time>
-                            <el-button type="text" class="button">Register</el-button>
+                            <el-button
+                                type="text"
+                                class="button"
+                                @click="toRouteTeacher(t.teachersid)"
+                            >Register</el-button>
                         </div>
                     </div>
                 </el-card>
@@ -35,75 +39,31 @@ i
 
 <script>
 import * as firebase from "firebase";
+
 export default {
   name: "HomePage",
   data() {
     return {
-      inputSearch: "",
-      teachers: [
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Johurul Haque",
-          subject: "English",
-          time: "10 am to 5 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Md. batin sheikh",
-          subject: "Physics",
-          time: "10 am to 3 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Dr. Azgor ali",
-          subject: "Economics",
-          time: "10 am to 5 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Shoriful Islam",
-          subject: "statistic",
-          time: "10 am to 5 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Johurul Haque",
-          subject: "English",
-          time: "10 am to 5 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Md. batin sheikh",
-          subject: "Physics",
-          time: "10 am to 3 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Dr. Azgor ali",
-          subject: "Economics",
-          time: "10 am to 5 pm"
-        },
-        {
-          imageUrl:
-            "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-          name: "Shoriful Islam",
-          subject: "statistic",
-          time: "10 am to 5 pm"
-        }
-      ],
-      currentDate: new Date()
+      inputSearch: ""
     };
+  },
+  computed: {
+    teachers() {
+      return this.$store.getters.allTeachers;
+    }
   },
   methods: {
     uploadData() {
-      this.$store.dispatch("uploadFirebase", "shamim");
+      return this.$store.dispatch("uploadFirebase", "shamim");
+    },
+    gotoTeacher(teacherID) {
+      this.$store.dispatch("teachersPage", teacherID);
+      console.log(teacherID);
+    },
+    toRouteTeacher(teacherID) {
+      let path = "/teacher/" + teacherID;
+      this.$router.push(path);
+      this.gotoTeacher(teacherID);
     }
   }
 };
