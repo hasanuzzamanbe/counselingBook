@@ -80,14 +80,49 @@ export const store = new Vuex.Store({
         message: "You can send me text also to know more about counseling hour"
       }
     ],
-    goToTeacher: {}
+    goToTeacher: {},
+    schedules: [
+      {
+        NameOfT: "Abdul Motin",
+        subject: "English",
+        time: "23 aug 2018 12.45",
+        status: "Accepted"
+      }
+    ],
+    requestFromSt: [
+      {
+        name: "Rakibul hasan",
+        studentId: "23456",
+        date1: "2018-11-16 at 16:07:08",
+        course: "math 321",
+        toTeacher: "123",
+        status: "Accepted"
+      }
+    ]
   },
+
   mutations: {
     setUser(state, payload) {
       state.user = payload;
     }
   },
   actions: {
+    sendCounselRequest({ state }, payload) {
+      state.requestFromSt.push(payload);
+
+      let MyRequestSchedules = {};
+      let teacherName = state.teachers.find(data => {
+        if (data.teachersid === payload.toTeacher) {
+          return data.name;
+        }
+      });
+
+      MyRequestSchedules.NameOfT = teacherName.name;
+      MyRequestSchedules.subject = payload.course;
+      MyRequestSchedules.time = payload.date1;
+      MyRequestSchedules.status = payload.status;
+      state.schedules.push(MyRequestSchedules);
+    },
     uploadFirebase(state, payload) {
       firebase
         .database()
@@ -170,6 +205,12 @@ export const store = new Vuex.Store({
     },
     user(state) {
       return state.user;
+    },
+    mySchedules(state) {
+      return state.schedules;
+    },
+    requestFromStudent(state) {
+      return state.requestFromSt;
     }
   }
 });

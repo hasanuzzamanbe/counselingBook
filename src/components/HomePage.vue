@@ -86,7 +86,7 @@ export default {
 }
 .cardBody {
   font-family: monospace;
-  font-size: 17px;
+  font-size: 14px;
   line-height: 9px;
   max-width: 244px;
   margin-bottom: 74px;

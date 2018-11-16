@@ -5,6 +5,7 @@ import Teacher from "@/components/teacherspage";
 import Profile from "@/user/profile";
 import SignIN from "@/user/signin";
 import SignUp from "@/user/signup";
+import Schedules from "@/components/schedules";
 Vue.use(Router);
 
 export default new Router({
@@ -34,6 +35,11 @@ export default new Router({
       path: "/profile",
       name: "Profile",
       component: Profile
+    },
+    {
+      path: "/schedules",
+      name: "Schedules",
+      component: Schedules
     }
   ]
 });

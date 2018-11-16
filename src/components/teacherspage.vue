@@ -16,8 +16,8 @@
                 </div>
             </el-col>
         </el-row>
-        <el-row>
-            <h3>Request teacher for counseling:</h3>
+        <el-row class="requestFormRow">
+            <h3 style="text-decoration:underline;">Request teacher for counseling:</h3>
             <el-form
                 :model="counselingDetails"
                 :rules="rules"
@@ -47,7 +47,7 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="12">
-                        <el-form-item label="Counseling time" required>
+                        <el-form-item label="Time" required>
                             <el-date-picker
                                 v-model="counselingDetails.date1"
                                 type="datetime"
@@ -57,9 +57,49 @@
                     </el-col>
                 </el-row>
                 <el-form-item>
-                    <el-button type="primary" @click="sendRequest">Request</el-button>
+                    <el-button
+                        type="success"
+                        size="small"
+                        style="width: 300px;
+                        font-size: 18px;
+                        font-family: monospace;"
+                        @click="sendRequest"
+                        :disabled="!requestFormValid"
+                    >Request</el-button>
                 </el-form-item>
             </el-form>
+        </el-row>
+        <el-row class="teacherRequestedRow">
+            <h3 style="text-decoration:underline;margin-top: 47px;">Teacher Requested by:</h3>
+            <el-row>
+                <p>students are showing bellow who are requested to this teacher</p>
+            </el-row>
+        </el-row>
+        <el-row v-for="(request,i) in requestFromSt" :key="i" class="byStudentRow">
+            <el-card class="cardBody" :body-style="{ padding: '0px' }">
+                <el-col :span="12">
+                    <div style="padding-left: 54px;">
+                        <h4
+                            style="font-size: 19px;
+                        margin-bottom: -4px;"
+                        >Name:{{request.name}}</h4>
+                        <p>Student Id:{{request.studentId}}</p>
+                        <time class="time">Time: {{request.date1}}</time>
+                        <p>Course: {{request.course}}</p>
+                    </div>
+                </el-col>
+                <el-col :span="8" style="margin-top: 27px;float:right">
+                    <span
+                        style="    border: 1px solid rgb(208, 163, 163);
+                        padding: 3px;
+                        border-radius: 14px;
+                        color: yellowgreen;
+                        position: absolute;
+                        background: #0f443fed;
+                        font-size: 15px;"
+                    >Status: {{request.status}}</span>
+                </el-col>
+            </el-card>
         </el-row>
     </div>
 </template>
@@ -70,11 +110,13 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      requestfrom: [],
       counselingDetails: {
         name: "",
         studentId: "",
         date1: "",
-        course: ""
+        course: "",
+        status: "on request.."
       },
       rules: {
         name: [
@@ -85,7 +127,7 @@ export default {
           },
           {
             min: 3,
-            message: "Length should be 3 to 5",
+            message: "Length should be min 3",
             trigger: "blur"
           }
         ],
@@ -106,13 +148,44 @@ export default {
     };
   },
   computed: {
+    requestFormValid() {
+      return (
+        this.counselingDetails.name !== "" &&
+        this.counselingDetails.studentId !== "" &&
+        this.counselingDetails.date1 !== "" &&
+        this.counselingDetails.course !== ""
+      );
+    },
     getTeachers() {
       return this.$store.getters.getTeacher;
+    },
+    requestFromSt() {
+      this.requestfrom = [];
+      this.$store.getters.requestFromStudent.find(data => {
+        if (data.toTeacher === this.ID) {
+          this.requestfrom.push(data);
+        }
+      });
+      return this.requestfrom;
     }
   },
   methods: {
     sendRequest() {
-      console.log(this.counselingDetails);
+      let x = this.counselingDetails.date1;
+      let date = JSON.stringify(x).substring(1, 11);
+      let time = JSON.stringify(x).substring(12, 20);
+      let arr = time.split();
+      let arr1 = Number(arr[0].substring(0, 2));
+      let arr2 = arr1 + 6;
+      let arr3 = arr[0].substring(3, arr[0].length);
+      let arr4 = arr2 + ":" + arr3;
+      let newDate = date + " " + "at" + " " + arr4;
+      this.counselingDetails.toTeacher = this.ID;
+      this.counselingDetails.date1 = newDate;
+
+      this.$store.dispatch("sendCounselRequest", this.counselingDetails);
+      this.counselingDetails = {};
+      this.counselingDetails.status = "on request..";
     }
   },
   mounted: function() {
@@ -124,7 +197,9 @@ export default {
 @media only screen and (min-width: 600px) {
   .teacherPage {
     padding: 106px;
+    font-family: monospace;
   }
+
   .el-form-item__error {
     margin-top: -35px;
   }
@@ -133,7 +208,49 @@ export default {
   text-decoration: underline;
 }
 .teacherDetailRow.el-row {
-  border: 1px solid #30313314;
+  border: 1px solid #e7dddd;
   padding: 24px;
+  background: #78e0c447;
+}
+p {
+  font-size: 16px;
+}
+h3 {
+  font-size: 20px;
+}
+.el-card.cardBody.is-always-shadow {
+  background: #3b7794;
+  color: white;
+}
+.teacherRequestedRow {
+  margin-top: 35px;
+  border-top: 1px solid #cebaba73;
+  border-left: 1px solid #cebaba73;
+  border-right: 1px solid #cebaba73;
+  padding: 12px;
+}
+.byStudentRow {
+  border-bottom: 1px solid #cebaba73;
+  border-left: 1px solid #cebaba73;
+  border-right: 1px solid #cebaba73;
+  padding: 12px;
+}
+.requestFormRow {
+  background-image: url(/static/img/formback.7e7de8c.jpg);
+  background-size: contain;
+  color: white;
+  margin-top: 20px;
+  border: 1px solid #cebaba73;
+  padding: 12px;
+  margin-top: 47px;
+}
+.el-button--success {
+  color: #fff;
+  background-color: #3b7794;
+  border-color: #3b7794;
+}
+.el-form-item__label {
+  font-size: 17px;
+  color: #ffffff !important;
 }
 </style>

@@ -9,7 +9,7 @@
                             <span slot="title">Profile</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="1-1" @click="profilePage">Edit User</el-menu-item>
+                            <el-menu-item index="1-1" @click="profilePage">User details</el-menu-item>
                             <el-menu-item index="1-2">Log-out</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
@@ -17,7 +17,7 @@
                         <i class="el-icon-menu"></i>
                         <span slot="title">Teachers</span>
                     </el-menu-item>
-                    <el-menu-item index="3">
+                    <el-menu-item index="3" @click="Schedules">
                         <i class="el-icon-document"></i>
                         <span slot="title">Schedules</span>
                     </el-menu-item>
@@ -65,6 +65,9 @@ export default {
     },
     profilePage() {
       this.$router.push("/profile");
+    },
+    Schedules() {
+      this.$router.push("/schedules");
     }
   }
 };
