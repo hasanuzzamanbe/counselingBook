@@ -85,11 +85,20 @@ export const store = new Vuex.Store({
         });
     },
     sendCounselRequest({ state }, payload) {
-      state.requestFromSt.push(payload);
       firebase
         .database()
         .ref("requestToTeacher")
-        .push(payload);
+        .push(payload)
+        .then(data => {
+          payload.requestId = data.key;
+          let newPath = "requestToTeacher" + "/" + data.key;
+          firebase
+            .database()
+            .ref(newPath)
+            .set(payload);
+        });
+
+      state.requestFromSt.push(payload);
 
       let MyRequestSchedules = {};
       let teacherName = state.teachers.find(data => {
@@ -103,12 +112,20 @@ export const store = new Vuex.Store({
       MyRequestSchedules.time = payload.date1;
       MyRequestSchedules.status = payload.status;
       MyRequestSchedules.studentUidF = payload.studentUidF;
-      state.schedules.push(MyRequestSchedules);
 
       firebase
         .database()
         .ref("myschedules")
-        .push(MyRequestSchedules);
+        .push(MyRequestSchedules)
+        .then(data => {
+          MyRequestSchedules.requestId = data.key;
+          let newPath = "myschedules" + "/" + data.key;
+          firebase
+            .database()
+            .ref(newPath)
+            .set(MyRequestSchedules);
+        });
+      state.schedules.push(MyRequestSchedules);
     },
 
     uploadFirebase(state, payload) {

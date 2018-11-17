@@ -29,7 +29,7 @@ i
                                 type="text"
                                 class="button"
                                 @click="toRouteTeacher(t.teachersid)"
-                            >Register</el-button>
+                            >View</el-button>
                         </div>
                     </div>
                 </el-card>

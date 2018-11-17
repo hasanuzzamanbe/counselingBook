@@ -89,22 +89,31 @@
                     </div>
                 </el-col>
                 <el-col :span="8" style="margin-top: 27px;float:right">
-                    <span
-                        style="    border: 1px solid rgb(208, 163, 163);
-                        padding: 3px;
-                        border-radius: 14px;
-                        color: yellowgreen;
-                        position: absolute;
-                        background: #0f443fed;
-                        font-size: 15px;"
-                    >Status: {{request.status}}</span>
-                    <el-button
-                        size="mini"
-                        type="primary"
-                        style="margin-top: 50px;
+                    <span class="statusSpan">Status: {{request.status}}</span>
+                    <el-button-group style="margin-top: 80px;" v-if="isThisTeacher">
+                        <el-button
+                            size="small"
+                            type="primary"
+                            style="
                             background-color: #3b7794;"
-                        v-if="isThisTeacher"
-                    >Open</el-button>
+                            @click="setStatus(i)"
+                        >Open</el-button>
+                        <el-button
+                            label="Accept"
+                            @click="acceptedByT(i)"
+                            size="small"
+                            type="primary"
+                        >Accept</el-button>
+                    </el-button-group>
+                    <el-dialog
+                        title="Tell something else"
+                        :visible.sync="dialogVisible"
+                        width="30%"
+                    >
+                        <el-input type="text" v-model="requedtEdit.status"></el-input>
+                        <el-button @click="dialogVisible = false">Cancel</el-button>
+                        <el-button type="primary" @click="submitEdit ">Confirm</el-button>
+                    </el-dialog>
                 </el-col>
             </el-card>
         </el-row>
@@ -117,7 +126,9 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      dialogVisible: false,
       requestfrom: [],
+      requedtEdit: {},
       counselingDetails: {
         name: "",
         studentId: "",
@@ -182,6 +193,38 @@ export default {
     }
   },
   methods: {
+    acceptedByT(reqStdId) {
+      this.$store.getters.requestFromStudent.filter((data, i) => {
+        if (i === reqStdId) {
+          return (this.requedtEdit = data);
+        }
+      });
+      this.requedtEdit.status = "Accepted";
+      let pathofPost = this.requedtEdit.requestId;
+      let path = "requestToTeacher" + "/" + pathofPost;
+      firebase
+        .database()
+        .ref(path)
+        .set(this.requedtEdit);
+    },
+    setStatus(reqStdId) {
+      this.dialogVisible = true;
+      this.$store.getters.requestFromStudent.filter((data, i) => {
+        if (i === reqStdId) {
+          return (this.requedtEdit = data);
+        }
+      });
+    },
+    submitEdit() {
+      let pathofPost = this.requedtEdit.requestId;
+      let path = "requestToTeacher" + "/" + pathofPost;
+      console.log(this.requestEdit);
+      firebase
+        .database()
+        .ref(path)
+        .set(this.requedtEdit);
+      this.dialogVisible = false;
+    },
     alertOfSenrRequest() {
       this.$notify({
         title: "Success",
@@ -273,5 +316,18 @@ h3 {
 .el-form-item__label {
   font-size: 17px;
   color: #ffffff !important;
+}
+.statusSpan {
+  border: 1px solid rgb(208, 163, 163);
+  padding: 3px;
+  border-radius: 6px;
+  color: yellowgreen;
+  position: absolute;
+  background: #0f443fed;
+  font-size: 15px;
+  min-height: 22px;
+  max-height: 54px;
+  max-width: 301px;
+  overflow: hidden;
 }
 </style>
