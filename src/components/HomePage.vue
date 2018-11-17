@@ -25,6 +25,7 @@ i
                         <div class="bottom clearfix">
                             <time class="time">{{ t.time }}</time>
                             <el-button
+                                :disabled="!userIsAuthenticated"
                                 type="text"
                                 class="button"
                                 @click="toRouteTeacher(t.teachersid)"
@@ -50,6 +51,12 @@ export default {
   computed: {
     teachers() {
       return this.$store.getters.allTeachers;
+    },
+    userIsAuthenticated() {
+      return (
+        this.$store.getters.user !== null &&
+        this.$store.getters.user !== undefined
+      );
     }
   },
   methods: {
@@ -116,5 +123,9 @@ export default {
 .el-input-group--append .el-input__inner,
 .el-input-group__prepend {
   height: 29px;
+}
+.el-col-6 {
+  width: 25%;
+  min-width: 143px;
 }
 </style>

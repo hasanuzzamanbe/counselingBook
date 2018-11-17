@@ -52,7 +52,7 @@
                     <el-form-item>
                         <el-button
                             type="success"
-                            @click="submitForm()"
+                            @click="onSignIn()"
                             size="small"
                             :disabled="!mailvalidated || !passValidate"
                         >Log in</el-button>
@@ -84,8 +84,11 @@ export default {
     }
   },
   methods: {
-    submitForm() {
-      console.log(this.signInFormData);
+    onSignIn() {
+      this.$store.dispatch("signUserIn", {
+        email: this.signInFormData.mail,
+        password: this.signInFormData.pass
+      });
     },
     redirectSignup() {
       this.$router.push("/signup");

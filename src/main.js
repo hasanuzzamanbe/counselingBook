@@ -33,8 +33,7 @@ new Vue({
     });
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
-        // this.$store.dispatch("autoSignIn", user);
-        console.log("user is authenticated");
+        this.$store.dispatch("autoSignIn", user);
       }
     });
   }

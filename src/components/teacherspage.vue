@@ -170,6 +170,13 @@ export default {
     }
   },
   methods: {
+    alertOfSenrRequest() {
+      this.$notify({
+        title: "Success",
+        message: "Your request is submitted to teacher",
+        type: "success"
+      });
+    },
     sendRequest() {
       let x = this.counselingDetails.date1;
       let date = JSON.stringify(x).substring(1, 11);
@@ -184,6 +191,7 @@ export default {
       this.counselingDetails.date1 = newDate;
 
       this.$store.dispatch("sendCounselRequest", this.counselingDetails);
+      this.alertOfSenrRequest();
       this.counselingDetails = {};
       this.counselingDetails.status = "on request..";
     }
@@ -236,9 +244,9 @@ h3 {
   padding: 12px;
 }
 .requestFormRow {
-  background-image: url(/static/img/formback.7e7de8c.jpg);
-  background-size: contain;
-  color: white;
+  /* background-image: url(/static/img/formback.7e7de8c.jpg);
+  background-size: contain; */
+  color: rgb(20, 20, 20);
   margin-top: 20px;
   border: 1px solid #cebaba73;
   padding: 12px;

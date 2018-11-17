@@ -58,7 +58,7 @@
                     <el-form-item>
                         <el-button
                             type="primary"
-                            @click="submitForm()"
+                            @click="onSignUp()"
                             size="small"
                             :disabled="!mailvalidated || !passValidate"
                         >Sign Up</el-button>
@@ -121,12 +121,23 @@ export default {
     }
   },
   methods: {
-    submitForm() {
-      let signUpData = {
-        mail: this.signUpFormData.mail,
-        pass: this.signUpFormData.pass
-      };
-      console.log(signUpData);
+    signUpSuccessAlert() {
+      this.$notify({
+        title: "Success",
+        message: "Your account created successfully",
+        type: "success"
+      });
+    },
+    onSignUp() {
+      this.$store.dispatch("signUserUp", {
+        email: this.signUpFormData.mail,
+        password: this.signUpFormData.pass
+      });
+      this.signUpSuccessAlert();
+
+      this.signUpFormData.mail = "";
+      this.signUpFormData.pass = "";
+      this.signUpFormData.checkPass = "";
     },
     redirectSignin() {
       this.$router.push("/signin");

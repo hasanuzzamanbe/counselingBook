@@ -6,6 +6,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     user: null,
+    error: null,
     teachers: [
       {
         teachersid: "121",
@@ -104,6 +105,12 @@ export const store = new Vuex.Store({
   mutations: {
     setUser(state, payload) {
       state.user = payload;
+    },
+    setError(state, payload) {
+      state.error = payload;
+    },
+    clearError(state) {
+      state.error = null;
     }
   },
   actions: {
@@ -140,56 +147,40 @@ export const store = new Vuex.Store({
       });
     },
     signUserUp({ commit }, payload) {
-      commit("setLoading", true);
       commit("clearError");
       firebase
         .auth()
         .createUserWithEmailAndPassword(payload.email, payload.password)
         .then(user => {
-          commit("setLoading", false);
           const newUser = {
             id: user.user.uid
           };
           commit("setUser", newUser);
         })
         .catch(error => {
-          commit("setLoading", false);
           commit("setError", error);
         });
     },
     signUserIn({ commit }, payload) {
-      commit("setLoading", true);
       commit("clearError");
       firebase
         .auth()
         .signInWithEmailAndPassword(payload.email, payload.password)
         .then(user => {
-          commit("setLoading", false);
           const newUser = {
             id: user.user.uid
           };
           commit("setUser", newUser);
         })
         .catch(error => {
-          commit("setLoading", false);
-          commit("setError", error);
-        });
-    },
-    userProfileData({ state }, Username) {
-      var user = firebase.auth().currentUser;
-      user
-        .updateProfile({
-          displayName: Username
-        })
-        .then(() => {
-          state.user.displayName = Username;
-        })
-        .catch(function(error) {
-          console.log(error);
+          commit("setError", error.code);
+          if (error.code) {
+            alert(error.code);
+          }
         });
     },
     autoSignIn({ commit }, payload) {
-      commit("setUser", {});
+      commit("setUser", { id: payload.uid });
     },
     logout({ commit }) {
       firebase.auth().signOut();

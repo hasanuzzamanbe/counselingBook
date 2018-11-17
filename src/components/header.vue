@@ -3,14 +3,14 @@
         <el-row>
             <el-col :span="6">
                 <el-menu>
-                    <el-submenu index="1" v-if="!userIsAuthenticated">
+                    <el-submenu index="1" v-if="userIsAuthenticated">
                         <template slot="title">
                             <i class="el-icon-menu"></i>
                             <span slot="title">Profile</span>
                         </template>
                         <el-menu-item-group>
                             <el-menu-item index="1-1" @click="profilePage">User details</el-menu-item>
-                            <el-menu-item index="1-2">Log-out</el-menu-item>
+                            <el-menu-item index="1-2" @click="onLogOut">Log-out</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
                     <el-menu-item index="2" @click="TeachersPage">
@@ -54,6 +54,9 @@ export default {
     }
   },
   methods: {
+    onLogOut() {
+      this.$store.dispatch("logout");
+    },
     TeachersPage() {
       this.$router.push("/");
     },
