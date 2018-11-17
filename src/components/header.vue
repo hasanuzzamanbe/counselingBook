@@ -17,9 +17,9 @@
                         <i class="el-icon-menu"></i>
                         <span slot="title">Teachers</span>
                     </el-menu-item>
-                    <el-menu-item index="3" @click="Schedules">
+                    <el-menu-item index="3" @click="Schedules" v-if="userIsAuthenticated">
                         <i class="el-icon-document"></i>
-                        <span slot="title">Schedules</span>
+                        <span slot="title">My Schedules</span>
                     </el-menu-item>
                     <el-menu-item index="4" v-if="!userIsAuthenticated" @click="SignInPage">
                         <i class="el-icon-setting"></i>
@@ -42,6 +42,7 @@ export default {
   props: ["ID"],
   data() {
     return {
+      STDID: "",
       tabPosition: "left"
     };
   },
@@ -70,7 +71,9 @@ export default {
       this.$router.push("/profile");
     },
     Schedules() {
-      this.$router.push("/schedules");
+      this.STDID = this.$store.getters.user.id;
+      let path = "/schedules/" + this.STDID;
+      this.$router.push(path);
     }
   }
 };

@@ -46,7 +46,7 @@
                             ></el-input>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="12">
+                    <el-col :span="12" style="margin-left: -63px;">
                         <el-form-item label="Time" required>
                             <el-date-picker
                                 v-model="counselingDetails.date1"
@@ -98,6 +98,13 @@
                         background: #0f443fed;
                         font-size: 15px;"
                     >Status: {{request.status}}</span>
+                    <el-button
+                        size="mini"
+                        type="primary"
+                        style="margin-top: 50px;
+                            background-color: #3b7794;"
+                        v-if="isThisTeacher"
+                    >Open</el-button>
                 </el-col>
             </el-card>
         </el-row>
@@ -114,6 +121,7 @@ export default {
       counselingDetails: {
         name: "",
         studentId: "",
+        studentUidF: "",
         date1: "",
         course: "",
         status: "on request.."
@@ -148,6 +156,10 @@ export default {
     };
   },
   computed: {
+    isThisTeacher() {
+      let user = this.$store.getters.user.id;
+      return this.ID === user;
+    },
     requestFormValid() {
       return (
         this.counselingDetails.name !== "" &&
@@ -189,13 +201,14 @@ export default {
       let newDate = date + " " + "at" + " " + arr4;
       this.counselingDetails.toTeacher = this.ID;
       this.counselingDetails.date1 = newDate;
-
+      this.counselingDetails.studentUidF = this.$store.getters.user.id;
       this.$store.dispatch("sendCounselRequest", this.counselingDetails);
       this.alertOfSenrRequest();
       this.counselingDetails = {};
       this.counselingDetails.status = "on request..";
     }
   },
+
   mounted: function() {
     this.$store.dispatch("teachersPage", this.ID);
   }

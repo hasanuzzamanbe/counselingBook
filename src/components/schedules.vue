@@ -11,7 +11,7 @@
                 <el-card class="cardBody" :body-style="{ padding: '0px' }">
                     <div style="padding: 14px;">
                         <span>{{reg.NameOfT}}</span>
-                        <p>Subject:{{reg.subject}}</p>
+                        <p>Requested for:{{reg.subject}}</p>
                         <div class="bottom clearfix">
                             <time class="time">Time: {{ reg.time }}</time>
                             <p>
@@ -32,6 +32,7 @@
 </template>
 <script>
 export default {
+  props: ["STDID"],
   data() {
     return {};
   },
@@ -52,5 +53,8 @@ export default {
 p {
   font-family: monospace;
   font-size: 16px;
+}
+.el-col-6 {
+  min-width: 223px;
 }
 </style>

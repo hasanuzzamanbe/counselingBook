@@ -37,7 +37,7 @@ export default new Router({
       component: Profile
     },
     {
-      path: "/schedules",
+      path: "/schedules/:STDID",
       name: "Schedules",
       component: Schedules
     }
