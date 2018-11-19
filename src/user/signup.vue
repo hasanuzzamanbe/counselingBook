@@ -29,7 +29,7 @@
                             type="email"
                         ></el-input>
                         <span
-                            v-if="!mailvalidated"
+                            v-if="!mailvalidated && !mailBoxnotEmpty"
                             style="
                                   font-size: 12px;
                                   color: #f56c6c;
@@ -111,6 +111,9 @@ export default {
   computed: {
     mailvalidated() {
       return this.validateEmail(this.signUpFormData.mail);
+    },
+    mailBoxnotEmpty() {
+      return this.signUpFormData.mail !== " ";
     },
     passValidate() {
       return (

@@ -9,7 +9,8 @@
                             <span slot="title">Profile</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="1-1" @click="profilePage">User details</el-menu-item>
+                            <!-- <el-menu-item index="1-1" @click="profilePage">User details</el-menu-item> -->
+                            <el-menu-item index="1-1" @click="adminonly">Admin Panel</el-menu-item>
                             <el-menu-item index="1-2" @click="onLogOut">Log-out</el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
@@ -17,9 +18,21 @@
                         <i class="el-icon-menu"></i>
                         <span slot="title">Teachers</span>
                     </el-menu-item>
-                    <el-menu-item index="3" @click="Schedules" v-if="userIsAuthenticated">
+                    <el-menu-item
+                        index="3"
+                        @click="Schedules"
+                        v-if="userIsAuthenticated && !isUserTeacher"
+                    >
                         <i class="el-icon-document"></i>
                         <span slot="title">My Schedules</span>
+                    </el-menu-item>
+                    <el-menu-item
+                        index="3"
+                        @click="MyDashboard"
+                        v-if="userIsAuthenticated && isUserTeacher"
+                    >
+                        <i class="el-icon-document"></i>
+                        <span slot="title">My Dashboard</span>
                     </el-menu-item>
                     <el-menu-item index="4" v-if="!userIsAuthenticated" @click="SignInPage">
                         <i class="el-icon-setting"></i>
@@ -47,6 +60,20 @@ export default {
     };
   },
   computed: {
+    isLoading() {
+      return this.$store.getters.getloadingState;
+    },
+    isUserTeacher() {
+      let getuser = this.$store.getters.userId;
+      let allteachers = this.$store.getters.allTeachers;
+      let teacher = false;
+      allteachers.find(data => {
+        if (getuser === data.teachersid) {
+          teacher = true;
+        }
+      });
+      return teacher;
+    },
     userIsAuthenticated() {
       return (
         this.$store.getters.user !== null &&
@@ -55,8 +82,12 @@ export default {
     }
   },
   methods: {
+    adminonly() {
+      this.$router.push("/adminpanel");
+    },
     onLogOut() {
       this.$store.dispatch("logout");
+      this.$router.push("/");
     },
     TeachersPage() {
       this.$router.push("/");
@@ -73,6 +104,11 @@ export default {
     Schedules() {
       this.STDID = this.$store.getters.user.id;
       let path = "/schedules/" + this.STDID;
+      this.$router.push(path);
+    },
+    MyDashboard() {
+      let getuserId = this.$store.getters.userId;
+      let path = "/teacher/" + getuserId;
       this.$router.push(path);
     }
   }

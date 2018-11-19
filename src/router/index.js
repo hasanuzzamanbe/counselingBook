@@ -5,6 +5,7 @@ import Teacher from "@/components/teacherspage";
 import Profile from "@/user/profile";
 import SignIN from "@/user/signin";
 import SignUp from "@/user/signup";
+import Admin from "@/components/admin";
 import Schedules from "@/components/schedules";
 Vue.use(Router);
 
@@ -40,6 +41,11 @@ export default new Router({
       path: "/schedules/:STDID",
       name: "Schedules",
       component: Schedules
+    },
+    {
+      path: "/adminpanel",
+      name: "adminpanel",
+      component: Admin
     }
   ]
 });

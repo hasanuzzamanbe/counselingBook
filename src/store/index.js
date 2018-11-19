@@ -5,46 +5,10 @@ import * as firebase from "firebase";
 Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
+    loading: false,
     user: null,
     error: null,
-    teachers: [
-      {
-        teachersid: "9p8N1xNwTPXFsSoTl82RB0cIW3D3",
-        imageUrl:
-          "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-        name: "Johurul Haque",
-        subject: "English",
-        time: "10 am to 5 pm",
-        message: "You can send me text also to know more about counseling hour"
-      },
-      {
-        teachersid: "vxeFPyNrQtPfgJRdJibsD3HZbvH2",
-        imageUrl:
-          "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-        name: "Md. batin sheikh",
-        subject: "Physics",
-        time: "10 am to 3 pm",
-        message: "You can send me text also to know more about counseling hour"
-      },
-      {
-        teachersid: "YOIY5EWq5oe3heMfv1JEHfXMRlt1",
-        imageUrl:
-          "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-        name: "Dr. Azgor ali",
-        subject: "Economics",
-        time: "10 am to 5 pm",
-        message: "You can send me text also to know more about counseling hour"
-      },
-      {
-        teachersid: "ZHfC77tFPfRjC4qSpasXiRwbOSJ3",
-        imageUrl:
-          "https://d2x5ku95bkycr3.cloudfront.net/App_Themes/Common/images/profile/0_200.png",
-        name: "Shoriful Islam",
-        subject: "statistic",
-        time: "10 am to 5 pm",
-        message: "You can send me text also to know more about counseling hour"
-      }
-    ],
+    teachers: [],
     goToTeacher: {},
     schedules: [],
     requestFromSt: []
@@ -63,6 +27,7 @@ export const store = new Vuex.Store({
   },
   actions: {
     loadData({ state }) {
+      state.loading = true;
       firebase
         .database()
         .ref("requestToTeacher")
@@ -72,19 +37,33 @@ export const store = new Vuex.Store({
           for (let i in requestData) {
             state.requestFromSt.push(requestData[i]);
           }
+          state.loading = false;
         });
+    },
+    loadDataOfTeacher({ state }) {
+      state.loading = true;
       firebase
         .database()
-        .ref("myschedules")
+        .ref("teachers")
         .once("value")
         .then(data => {
-          let getschedules = data.val();
-          for (let i in getschedules) {
-            state.schedules.push(getschedules[i]);
+          let requestData = data.val();
+          for (let i in requestData) {
+            state.teachers.push(requestData[i]);
           }
+          state.loading = false;
         });
     },
     sendCounselRequest({ state }, payload) {
+      state.loading = true;
+      let teacherName = state.teachers.find(data => {
+        if (data.teachersid === payload.toTeacher) {
+          return data.name;
+        }
+      });
+
+      payload.Teacher = teacherName.name;
+
       firebase
         .database()
         .ref("requestToTeacher")
@@ -95,37 +74,21 @@ export const store = new Vuex.Store({
           firebase
             .database()
             .ref(newPath)
-            .set(payload);
+            .set(payload)
+            .then(data => {
+              state.loading = false;
+            });
         });
 
       state.requestFromSt.push(payload);
-
-      let MyRequestSchedules = {};
-      let teacherName = state.teachers.find(data => {
-        if (data.teachersid === payload.toTeacher) {
-          return data.name;
-        }
-      });
-
-      MyRequestSchedules.NameOfT = teacherName.name;
-      MyRequestSchedules.subject = payload.course;
-      MyRequestSchedules.time = payload.date1;
-      MyRequestSchedules.status = payload.status;
-      MyRequestSchedules.studentUidF = payload.studentUidF;
-
+    },
+    addTeacher({ state }, payload) {
       firebase
         .database()
-        .ref("myschedules")
-        .push(MyRequestSchedules)
-        .then(data => {
-          MyRequestSchedules.requestId = data.key;
-          let newPath = "myschedules" + "/" + data.key;
-          firebase
-            .database()
-            .ref(newPath)
-            .set(MyRequestSchedules);
-        });
-      state.schedules.push(MyRequestSchedules);
+        .ref("teachers")
+        .push(payload)
+        .then(data => {});
+      state.teachers.push(payload);
     },
 
     uploadFirebase(state, payload) {
@@ -133,9 +96,7 @@ export const store = new Vuex.Store({
         .database()
         .ref("students")
         .push(payload)
-        .then(data => {
-          console.log(data.key);
-        });
+        .then(data => {});
     },
     teachersPage({ state }, payload) {
       state.teachers.find(data => {
@@ -183,9 +144,21 @@ export const store = new Vuex.Store({
     logout({ commit }) {
       firebase.auth().signOut();
       commit("setUser", null);
+    },
+    removeRequestlocal({ state }, payload) {
+      let indexRem = state.requestFromSt.find(data => {
+        if (data.requestId === payload) {
+          return data;
+        }
+      });
+      let indexRemDel = state.requestFromSt.indexOf(indexRem);
+      state.requestFromSt.splice(indexRemDel, 1);
     }
   },
   getters: {
+    getloadingState(state) {
+      return state.loading;
+    },
     allTeachers(state) {
       return state.teachers;
     },
@@ -195,9 +168,12 @@ export const store = new Vuex.Store({
     user(state) {
       return state.user;
     },
+    userId(state) {
+      return state.user.id;
+    },
     mySchedules(state) {
       let mySchedules = [];
-      state.schedules.find(data => {
+      state.requestFromSt.find(data => {
         if (data.studentUidF === state.user.id) {
           mySchedules.push(data);
         }

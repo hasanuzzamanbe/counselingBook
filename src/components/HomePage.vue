@@ -4,15 +4,21 @@ i
         <div class="firstHeader">
             <h3>OUR HONURABLE TEACHERS</h3>
         </div>
-        <el-row style="margin-bottom:20px; padding-right: 61px;">
-            <el-col :span="6" style="float:right">
-                <el-input
-                    placeholder="Please input for search"
-                    v-model="inputSearch"
-                    class="input-with-select"
-                >
-                    <el-button slot="append" icon="el-icon-search"></el-button>
-                </el-input>
+        <el-row v-if="isLoading">
+            <el-col :span="8">
+                <div class="grid-content bg-purple-light">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
+            </el-col>
+            <el-col :span="8">
+                <div class="grid-content bg-purple-light">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
+            </el-col>
+            <el-col :span="8">
+                <div class="grid-content bg-purple-light">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
             </el-col>
         </el-row>
         <el-row>
@@ -49,6 +55,9 @@ export default {
     };
   },
   computed: {
+    isLoading() {
+      return this.$store.getters.getloadingState;
+    },
     teachers() {
       return this.$store.getters.allTeachers;
     },

@@ -89,6 +89,8 @@ export default {
         email: this.signInFormData.mail,
         password: this.signInFormData.pass
       });
+      this.signInFormData.pass = "";
+      this.signInFormData.mail = "";
     },
     redirectSignup() {
       this.$router.push("/signup");

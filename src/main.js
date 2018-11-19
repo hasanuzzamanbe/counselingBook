@@ -37,5 +37,6 @@ new Vue({
       }
     });
     this.$store.dispatch("loadData");
+    this.$store.dispatch("loadDataOfTeacher");
   }
 });

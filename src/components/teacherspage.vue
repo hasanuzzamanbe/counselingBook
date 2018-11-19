@@ -9,7 +9,18 @@
                     <p>Available time:{{teacher.time}}</p>
                     <p>Message from teacher: {{teacher.message}}</p>
                 </div>
+                <el-button v-if="isThisTeacher" @click="editDetailsModal=true">Edit details</el-button>
             </el-col>
+            <el-dialog :visible.sync="editDetailsModal" v-if="editDetailsModal">
+                <div v-for="(teacher) in getTeachers" :key="teacher.teachersid">
+                    <h2>Edit user details from here</h2>
+                    <el-input type="text" v-model="teacher.name"></el-input>
+                    <el-input type="text" v-model="teacher.subject"></el-input>
+                    <el-input type="text" v-model="teacher.time"></el-input>
+                    <el-input type="text" v-model="teacher.message"></el-input>
+                </div>
+                <el-button type="success" @click="submiteditDetails">Save</el-button>
+            </el-dialog>
             <el-col :span="6">
                 <div class="grid-content bg-purple-light">
                     <img :src="teacher.imageUrl" alt="">
@@ -75,6 +86,13 @@
                 <p>students are showing bellow who are requested to this teacher</p>
             </el-row>
         </el-row>
+        <el-row v-if="isLoading">
+            <el-col :span="8">
+                <div class="grid-content bg-purple">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
+            </el-col>
+        </el-row>
         <el-row v-for="(request,i) in requestFromSt" :key="i" class="byStudentRow">
             <el-card class="cardBody" :body-style="{ padding: '0px' }">
                 <el-col :span="12">
@@ -90,20 +108,28 @@
                 </el-col>
                 <el-col :span="8" style="margin-top: 27px;float:right">
                     <span class="statusSpan">Status: {{request.status}}</span>
-                    <el-button-group style="margin-top: 80px;" v-if="isThisTeacher">
+                    <el-button-group style="margin-top: 80px;">
                         <el-button
-                            size="small"
+                            v-if="isThisTeacher"
+                            size="mini"
                             type="primary"
                             style="
                             background-color: #3b7794;"
                             @click="setStatus(i)"
                         >Open</el-button>
                         <el-button
+                            v-if="isThisTeacher"
                             label="Accept"
                             @click="acceptedByT(i)"
-                            size="small"
+                            size="mini"
                             type="primary"
                         >Accept</el-button>
+                        <el-button
+                            type="primary"
+                            size="mini"
+                            @click="submitDelete(i) "
+                            v-if="IsValidUserStudent ===request.studentUidF"
+                        >Delete</el-button>
                     </el-button-group>
                     <el-dialog
                         title="Tell something else"
@@ -126,6 +152,7 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      editDetailsModal: false,
       dialogVisible: false,
       requestfrom: [],
       requedtEdit: {},
@@ -168,8 +195,16 @@ export default {
   },
   computed: {
     isThisTeacher() {
-      let user = this.$store.getters.user.id;
-      return this.ID === user;
+      if (
+        this.$store.getters.user !== null &&
+        this.$store.getters.user !== undefined
+      ) {
+        let user = this.$store.getters.user.id;
+        return this.ID === user;
+      }
+    },
+    IsValidUserStudent() {
+      return this.$store.getters.userId;
     },
     requestFormValid() {
       return (
@@ -190,9 +225,15 @@ export default {
         }
       });
       return this.requestfrom;
+    },
+    isLoading() {
+      return this.$store.getters.getloadingState;
     }
   },
   methods: {
+    submiteditDetails() {
+      console.log(this.getTeachers[0]);
+    },
     acceptedByT(reqStdId) {
       this.$store.getters.requestFromStudent.filter((data, i) => {
         if (i === reqStdId) {
@@ -218,13 +259,26 @@ export default {
     submitEdit() {
       let pathofPost = this.requedtEdit.requestId;
       let path = "requestToTeacher" + "/" + pathofPost;
-      console.log(this.requestEdit);
       firebase
         .database()
         .ref(path)
         .set(this.requedtEdit);
       this.dialogVisible = false;
     },
+    submitDelete(reqStdId) {
+      this.$store.getters.requestFromStudent.filter((data, i) => {
+        if (i === reqStdId) {
+          return (this.requedtEdit = data);
+        }
+      });
+      let pathofPost = this.requedtEdit.requestId;
+      let path = "requestToTeacher" + "/" + pathofPost;
+      let firebaseRef = firebase.database().ref(path);
+      firebaseRef.remove().then(() => {});
+
+      this.$store.dispatch("removeRequestlocal", pathofPost);
+    },
+
     alertOfSenrRequest() {
       this.$notify({
         title: "Success",
@@ -329,5 +383,8 @@ h3 {
   max-height: 54px;
   max-width: 301px;
   overflow: hidden;
+}
+input.el-input__inner {
+  margin-bottom: 8px;
 }
 </style>
