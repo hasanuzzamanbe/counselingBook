@@ -1,7 +1,14 @@
 <template>
     <div class="mainDivTemplate">
-        <h3 class="headSignup">Sign-in</h3>
-        <el-row class="firststRow">
+        <el-row class="loadImgHome" v-if="isLoading">
+            <el-col :span="8">
+                <div class="grid-content bg-purple-light">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
+            </el-col>
+        </el-row>
+        <h3 class="headSignup" v-if="!isLoading">Sign-in</h3>
+        <el-row class="firststRow" v-if="!isLoading">
             <p>
                 Here the sign in for both students and teachers.
                 If anyone want to register for counseling
@@ -11,7 +18,7 @@
                 <br>Please provide your mail and password bellow to login.
             </p>
         </el-row>
-        <el-row>
+        <el-row v-if="!isLoading">
             <el-col :span="16">
                 <el-form
                     @submit.native.prevent
@@ -81,6 +88,19 @@ export default {
     },
     passValidate() {
       return this.signInFormData.pass !== "";
+    },
+    isLoading() {
+      return this.$store.getters.getloadingState;
+    },
+    user() {
+      return this.$store.getters.user;
+    }
+  },
+  watch: {
+    user(value) {
+      if (value !== null && value !== undefined) {
+        this.$router.push("/");
+      }
     }
   },
   methods: {

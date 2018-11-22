@@ -1,6 +1,13 @@
 <template>
     <div class="teacherPage">
         <h3 class="teacherDetails">Teacher Details:</h3>
+        <el-row class="loadImgHome" v-if="isLoading">
+            <el-col :span="8">
+                <div class="grid-content bg-purple">
+                    <img src="@/assets/loader.gif" alt="">
+                </div>
+            </el-col>
+        </el-row>
         <el-row class="teacherDetailRow" v-for="teacher in getTeachers" :key="teacher.teachersid">
             <el-col :span="18">
                 <div class="grid-content bg-purple">
@@ -19,7 +26,7 @@
                     <el-input type="text" v-model="teacher.time"></el-input>
                     <el-input type="text" v-model="teacher.message"></el-input>
                 </div>
-                <el-button type="success" @click="submiteditDetails">Save</el-button>
+                <el-button type="success" @click="submiteditDetails(teacher.teachersid)">Save</el-button>
             </el-dialog>
             <el-col :span="6">
                 <div class="grid-content bg-purple-light">
@@ -86,7 +93,7 @@
                 <p>students are showing bellow who are requested to this teacher</p>
             </el-row>
         </el-row>
-        <el-row v-if="isLoading">
+        <el-row class="loadImgHome" v-if="isLoading">
             <el-col :span="8">
                 <div class="grid-content bg-purple">
                     <img src="@/assets/loader.gif" alt="">
@@ -115,19 +122,19 @@
                             type="primary"
                             style="
                             background-color: #3b7794;"
-                            @click="setStatus(i)"
+                            @click="setStatus(request.requestId)"
                         >Open</el-button>
                         <el-button
                             v-if="isThisTeacher"
                             label="Accept"
-                            @click="acceptedByT(i)"
+                            @click="acceptedByT(request.requestId)"
                             size="mini"
                             type="primary"
                         >Accept</el-button>
                         <el-button
                             type="primary"
                             size="mini"
-                            @click="submitDelete(i) "
+                            @click="submitDelete(request.requestId) "
                             v-if="IsValidUserStudent ===request.studentUidF"
                         >Delete</el-button>
                     </el-button-group>
@@ -143,6 +150,9 @@
                 </el-col>
             </el-card>
         </el-row>
+        <el-row>
+            <el-button @click="backtoHome" class="bootomButtonHome">back to home</el-button>
+        </el-row>
     </div>
 </template>
 
@@ -152,6 +162,8 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      teacherData: [],
+      TeacherDataKey: [],
       editDetailsModal: false,
       dialogVisible: false,
       requestfrom: [],
@@ -215,7 +227,13 @@ export default {
       );
     },
     getTeachers() {
-      return this.$store.getters.getTeacher;
+      this.teacherData = [];
+      this.$store.getters.allTeachers.find(data => {
+        if (data.teachersid === this.ID) {
+          this.teacherData.push(data);
+        }
+      });
+      return this.teacherData;
     },
     requestFromSt() {
       this.requestfrom = [];
@@ -231,18 +249,35 @@ export default {
     }
   },
   methods: {
-    submiteditDetails() {
-      console.log(this.getTeachers[0]);
+    backtoHome() {
+      this.$router.push("/");
+    },
+    submiteditDetails(idOfTec) {
+      let allTeacherWithKey = this.$store.getters.keyWithTeacherAll;
+      for (let obj in allTeacherWithKey) {
+        for (let ob in allTeacherWithKey[obj]) {
+          if (allTeacherWithKey[obj][ob] === idOfTec) {
+            this.TeacherDataKey = obj;
+          }
+        }
+      }
+      let path = "teachers" + "/" + this.TeacherDataKey;
+      firebase
+        .database()
+        .ref(path)
+        .set(this.getTeachers[0]);
+      this.editDetailsModal = false;
     },
     acceptedByT(reqStdId) {
-      this.$store.getters.requestFromStudent.filter((data, i) => {
-        if (i === reqStdId) {
+      this.$store.getters.requestFromStudent.filter(data => {
+        if (data.requestId === reqStdId) {
           return (this.requedtEdit = data);
         }
       });
       this.requedtEdit.status = "Accepted";
       let pathofPost = this.requedtEdit.requestId;
       let path = "requestToTeacher" + "/" + pathofPost;
+
       firebase
         .database()
         .ref(path)
@@ -250,8 +285,8 @@ export default {
     },
     setStatus(reqStdId) {
       this.dialogVisible = true;
-      this.$store.getters.requestFromStudent.filter((data, i) => {
-        if (i === reqStdId) {
+      this.$store.getters.requestFromStudent.filter(data => {
+        if (data.requestId === reqStdId) {
           return (this.requedtEdit = data);
         }
       });
@@ -266,13 +301,14 @@ export default {
       this.dialogVisible = false;
     },
     submitDelete(reqStdId) {
-      this.$store.getters.requestFromStudent.filter((data, i) => {
-        if (i === reqStdId) {
+      this.$store.getters.requestFromStudent.filter(data => {
+        if (data.requestId === reqStdId) {
           return (this.requedtEdit = data);
         }
       });
       let pathofPost = this.requedtEdit.requestId;
-      let path = "requestToTeacher" + "/" + pathofPost;
+
+      let path = "requestToTeacher" + "/" + reqStdId;
       let firebaseRef = firebase.database().ref(path);
       firebaseRef.remove().then(() => {});
 
@@ -386,5 +422,10 @@ h3 {
 }
 input.el-input__inner {
   margin-bottom: 8px;
+}
+.bootomButtonHome {
+  float: right;
+  margin-top: 101px;
+  margin-bottom: -69px;
 }
 </style>

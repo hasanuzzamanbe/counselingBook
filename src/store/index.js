@@ -5,6 +5,11 @@ import * as firebase from "firebase";
 Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
+    onApproveAdminWithkey: [],
+    approvalAdmin: [],
+    approvalTech: [],
+    alltecherWithKey: "",
+    admins: [],
     loading: false,
     user: null,
     error: null,
@@ -23,6 +28,9 @@ export const store = new Vuex.Store({
     },
     clearError(state) {
       state.error = null;
+    },
+    isloading(state, payload) {
+      state.loading = payload;
     }
   },
   actions: {
@@ -47,9 +55,37 @@ export const store = new Vuex.Store({
         .ref("teachers")
         .once("value")
         .then(data => {
+          state.alltecherWithKey = data.val();
           let requestData = data.val();
           for (let i in requestData) {
             state.teachers.push(requestData[i]);
+          }
+          state.loading = false;
+        });
+    },
+    loadApprovalsAdmin({ state }) {
+      firebase
+        .database()
+        .ref("approvalAdmin")
+        .once("value")
+        .then(data => {
+          let requestData = data.val();
+          state.onApproveAdminWithkey.push(requestData);
+          for (let i in requestData) {
+            state.approvalAdmin.push(requestData[i]);
+          }
+          state.loading = false;
+        });
+    },
+    loadApprovalsTeacher({ state }) {
+      firebase
+        .database()
+        .ref("approval")
+        .once("value")
+        .then(data => {
+          let requestData = data.val();
+          for (let i in requestData) {
+            state.approvalTech.push(requestData[i]);
           }
           state.loading = false;
         });
@@ -90,6 +126,28 @@ export const store = new Vuex.Store({
         .then(data => {});
       state.teachers.push(payload);
     },
+    makeAnAdmin({ state }, payload) {
+      firebase
+        .database()
+        .ref("admins")
+        .push(payload)
+        .then(data => {
+          alert("Admin Added Success");
+        });
+    },
+    loadDataOfAdmin({ state }) {
+      firebase
+        .database()
+        .ref("admins")
+        .once("value")
+        .then(data => {
+          let allAdmins = data.val();
+
+          for (let admin in allAdmins) {
+            state.admins.push(allAdmins[admin]);
+          }
+        });
+    },
 
     uploadFirebase(state, payload) {
       firebase
@@ -107,20 +165,74 @@ export const store = new Vuex.Store({
     },
     signUserUp({ commit }, payload) {
       commit("clearError");
+      commit("isloading", true);
       firebase
         .auth()
-        .createUserWithEmailAndPassword(payload.email, payload.password)
+        .createUserWithEmailAndPassword(payload.mail, payload.pass)
         .then(user => {
           const newUser = {
             id: user.user.uid
           };
           commit("setUser", newUser);
+          payload.teachersid = newUser.id;
+          delete payload.pass;
+          delete payload.checkPass;
+          firebase
+            .database()
+            .ref("approval")
+            .push(payload);
+          commit("isloading", false);
         })
         .catch(error => {
           commit("setError", error);
+          alert(error);
         });
     },
+    signUserUpadmin({ commit }, payload) {
+      commit("isloading", true);
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(payload.mail, payload.pass)
+        .then(user => {
+          const newUser = {
+            id: user.user.uid
+          };
+          commit("setUser", newUser);
+          payload.adminid = newUser.id;
+          delete payload.pass;
+
+          firebase
+            .database()
+            .ref("approvalAdmin")
+            .push(payload);
+          commit("isloading", false);
+        })
+        .catch(error => {
+          commit("setError", error);
+          alert(error);
+        });
+    },
+    signUserUpStudent({ commit }, payload) {
+      commit("isloading", true);
+      firebase
+        .auth()
+        .createUserWithEmailAndPassword(payload.mail, payload.pass)
+        .then(user => {
+          const newUser = {
+            id: user.user.uid
+          };
+          commit("setUser", newUser);
+
+          commit("isloading", false);
+        })
+        .catch(error => {
+          commit("setError", error);
+          alert(error);
+        });
+    },
+
     signUserIn({ commit }, payload) {
+      commit("isloading", true);
       commit("clearError");
       firebase
         .auth()
@@ -130,6 +242,7 @@ export const store = new Vuex.Store({
             id: user.user.uid
           };
           commit("setUser", newUser);
+          commit("isloading", false);
         })
         .catch(error => {
           commit("setError", error.code);
@@ -156,6 +269,9 @@ export const store = new Vuex.Store({
     }
   },
   getters: {
+    keyWithTeacherAll(state) {
+      return state.alltecherWithKey;
+    },
     getloadingState(state) {
       return state.loading;
     },
@@ -182,6 +298,18 @@ export const store = new Vuex.Store({
     },
     requestFromStudent(state) {
       return state.requestFromSt;
+    },
+    getAdmins(state) {
+      return state.admins;
+    },
+    loadApprovalsAdmin(state) {
+      return state.approvalAdmin;
+    },
+    loadApprovalstec(state) {
+      return state.approvalTech;
+    },
+    getDataOnapproveWithKey(state) {
+      return state.onApproveAdminWithkey;
     }
   }
 });

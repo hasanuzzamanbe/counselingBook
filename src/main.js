@@ -38,5 +38,8 @@ new Vue({
     });
     this.$store.dispatch("loadData");
     this.$store.dispatch("loadDataOfTeacher");
+    this.$store.dispatch("loadDataOfAdmin");
+    this.$store.dispatch("loadApprovalsAdmin");
+    this.$store.dispatch("loadApprovalsTeacher");
   }
 });

@@ -36,4 +36,10 @@ export default {
     padding-top: 16px;
   }
 }
+.loadImgHome {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 26%;
+}
 </style>

@@ -4,18 +4,8 @@ i
         <div class="firstHeader">
             <h3>OUR HONURABLE TEACHERS</h3>
         </div>
-        <el-row v-if="isLoading">
-            <el-col :span="8">
-                <div class="grid-content bg-purple-light">
-                    <img src="@/assets/loader.gif" alt="">
-                </div>
-            </el-col>
-            <el-col :span="8">
-                <div class="grid-content bg-purple-light">
-                    <img src="@/assets/loader.gif" alt="">
-                </div>
-            </el-col>
-            <el-col :span="8">
+        <el-row class="loadImgHome" v-if="isLoading">
+            <el-col :span="24">
                 <div class="grid-content bg-purple-light">
                     <img src="@/assets/loader.gif" alt="">
                 </div>
@@ -136,5 +126,12 @@ export default {
 .el-col-6 {
   width: 25%;
   min-width: 143px;
+}
+
+.loadImgHome {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 26%;
 }
 </style>
