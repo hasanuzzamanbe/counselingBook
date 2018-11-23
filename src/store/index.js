@@ -6,6 +6,7 @@ Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
     onApproveAdminWithkey: [],
+    onApproveTecWithkey: [],
     approvalAdmin: [],
     approvalTech: [],
     alltecherWithKey: "",
@@ -84,11 +85,14 @@ export const store = new Vuex.Store({
         .once("value")
         .then(data => {
           let requestData = data.val();
+          state.onApproveTecWithkey.push(data.val());
+
           for (let i in requestData) {
             state.approvalTech.push(requestData[i]);
           }
           state.loading = false;
         });
+      console.log(state.onApproveTecWithkey);
     },
     sendCounselRequest({ state }, payload) {
       state.loading = true;
@@ -310,6 +314,9 @@ export const store = new Vuex.Store({
     },
     getDataOnapproveWithKey(state) {
       return state.onApproveAdminWithkey;
+    },
+    getDataOnapproveWithKeyTec(state) {
+      return state.onApproveTecWithkey;
     }
   }
 });
