@@ -3,7 +3,7 @@
         <h3 class="headSignup">Sign-Up</h3>
         <el-row class="firststRow">
             <p>
-                Here the sign up for the new students only.
+                Here the sign up for the new students, Teacher and admins.
                 If anyone want to register for counseling
                 hour he/she must have to sign in.
                 <br>N.B: If you have an existing
@@ -20,11 +20,27 @@
             </el-col>
         </el-row>
         <el-tabs type="border-card" v-if="!isLoading" style="margin-bottom: 43px;">
+            <el-dialog title="Enter your mail address" :visible.sync="forgotPass" width="30%">
+                <el-input
+                    type="text"
+                    placeholder="enter your mail address"
+                    v-model="forgotPassMail"
+                ></el-input>
+                <span slot="footer" class="dialog-footer">
+                    <el-button @click="forgotPass = false">Cancel</el-button>
+                    <el-button
+                        type="primary"
+                        v-if="mailvalidatedForgotPass"
+                        @click="forgotPasswordReset"
+                    >Get reset link</el-button>
+                </span>
+            </el-dialog>
             <el-tab-pane label="Sign Up as Student">
                 <el-row>
                     <el-col :span="16">
                         <el-form
-                            style="margin-bottom: 100px;"
+                            style="margin-bottom: 60px;
+                            margin-top:32px"
                             :model="teacherData"
                             status-icon
                             :rules="rules2"
@@ -69,10 +85,13 @@
                                     type="primary"
                                     @click="onSignUpStudent()"
                                     size="small"
-                                    :disabled="!mailvalidated || !passValidate"
+                                    :disabled="!mailvalidated || !passValidatestd"
                                 >Sign Up</el-button>
                                 <p>Already have an account ?
                                     <el-button type="text" @click="redirectSignin">sign In</el-button>.
+                                </p>
+                                <p style="margin-top: -27px;">Forgot your password ?
+                                    <el-button type="text" @click="forgotPass=true">Forgot Password</el-button>.
                                 </p>
                             </el-form-item>
                         </el-form>
@@ -81,9 +100,15 @@
             </el-tab-pane>
             <el-tab-pane label="Sign Up as Teacher">
                 <el-row>
+                    <p class="notifySignUp">
+                        <i class="el-icon-info"></i>
+                        Your account will create as default user. And a request will send to the admins
+                        If admin approve you as a teacher,
+                        <br>Then your account will be upgrated to Teachers account, Your profile will show teachers panel then.
+                    </p>
                     <el-col :span="16">
                         <el-form
-                            style="margin-bottom: 100px;"
+                            style="margin-bottom: 60px;"
                             :model="teacherData"
                             status-icon
                             :rules="rules2"
@@ -154,6 +179,9 @@
                                 <p>Already have an account ?
                                     <el-button type="text" @click="redirectSignin">sign In</el-button>.
                                 </p>
+                                <p style="margin-top: -27px;">Forgot your password ?
+                                    <el-button type="text" @click="forgotPass=true">Forgot Password</el-button>.
+                                </p>
                             </el-form-item>
                         </el-form>
                     </el-col>
@@ -161,9 +189,15 @@
             </el-tab-pane>
             <el-tab-pane label="Sign Up as Admin">
                 <el-row>
+                    <p class="notifySignUp">
+                        <i class="el-icon-info"></i>
+                        Your account will create as default user. And a request will send to the admins
+                        If admin approve you as a admin,
+                        <br>Then your account will be upgrated to admins account
+                    </p>
                     <el-col :span="16">
                         <el-form
-                            style="margin-bottom: 100px;"
+                            style="margin-bottom: 60px;"
                             :model="teacherData"
                             status-icon
                             :rules="rules2"
@@ -215,10 +249,13 @@
                                     type="primary"
                                     @click="onSignUpAdmin()"
                                     size="small"
-                                    :disabled="!mailvalidated || !passValidate"
+                                    :disabled="!mailvalidated || !passValidateAdmin"
                                 >Sign Up</el-button>
                                 <p>Already have an account ?
                                     <el-button type="text" @click="redirectSignin">sign In</el-button>.
+                                </p>
+                                <p style="margin-top: -27px;">Forgot your password ?
+                                    <el-button type="text" @click="forgotPass=true">Forgot Password</el-button>.
                                 </p>
                             </el-form-item>
                         </el-form>
@@ -229,6 +266,7 @@
     </div>
 </template>
 <script>
+import * as firebase from "firebase";
 export default {
   data() {
     var validatePass = (rule, value, callback) => {
@@ -254,6 +292,8 @@ export default {
       }
     };
     return {
+      forgotPassMail: "",
+      forgotPass: false,
       teacherData: {},
       teacherData: {
         pass: "",
@@ -279,6 +319,9 @@ export default {
     mailvalidated() {
       return this.validateEmail(this.teacherData.mail);
     },
+    mailvalidatedForgotPass() {
+      return this.validateEmail(this.forgotPassMail);
+    },
     mailBoxnotEmpty() {
       return this.teacherData.mail !== " ";
     },
@@ -286,6 +329,25 @@ export default {
       return this.$store.getters.user;
     },
     passValidate() {
+      return (
+        this.teacherData.pass !== "" &&
+        this.teacherData.pass.length >= 6 &&
+        this.teacherData.pass === this.teacherData.checkPass &&
+        this.teacherData.name !== "" &&
+        this.teacherData.subject !== "" &&
+        this.teacherData.time !== "" &&
+        this.teacherData.imageUrl !== ""
+      );
+    },
+    passValidateAdmin() {
+      return (
+        this.teacherData.pass !== "" &&
+        this.teacherData.pass.length >= 6 &&
+        this.teacherData.pass === this.teacherData.checkPass &&
+        this.teacherData.name !== ""
+      );
+    },
+    passValidatestd() {
       return (
         this.teacherData.pass !== "" &&
         this.teacherData.pass.length >= 6 &&
@@ -301,6 +363,39 @@ export default {
     }
   },
   methods: {
+    forgotPasswordReset() {
+      firebase
+        .auth()
+        .sendPasswordResetEmail(this.forgotPassMail)
+        .catch(error => {
+          this.forgotPassAlertNoMail();
+        });
+      this.forgotPassAlert();
+      this.forgotPass = false;
+      this.forgotPassMail = "";
+    },
+    forgotPassAlert() {
+      this.$notify({
+        title: "Success",
+        message: "please check your mail address",
+        type: "success"
+      });
+    },
+    AlertAdminTeacher() {
+      this.$notify({
+        title: "Success",
+        message: "Your request is send to an admin",
+        type: "success"
+      });
+    },
+    forgotPassAlertNoMail() {
+      this.$notify({
+        title: "No user found",
+        message: "Your account is not registered",
+        type: "danger"
+      });
+    },
+
     signUpSuccessAlert() {
       this.$notify({
         title: "Success",
@@ -310,6 +405,7 @@ export default {
     },
     onSignUp() {
       this.$store.dispatch("signUserUp", this.teacherData);
+      this.AlertAdminTeacher();
     },
     onSignUpAdmin() {
       this.$store.dispatch("signUserUpadmin", {
@@ -317,6 +413,7 @@ export default {
         mail: this.teacherData.mail,
         pass: this.teacherData.pass
       });
+      this.AlertAdminTeacher();
     },
     onSignUpStudent() {
       this.$store.dispatch("signUserUpStudent", {
@@ -346,5 +443,11 @@ p {
 }
 .firststRow {
   margin-bottom: 32px;
+}
+p.notifySignUp {
+  line-height: 20px;
+  letter-spacing: -1px;
+  color: #409eff;
+  padding: 32px;
 }
 </style>
