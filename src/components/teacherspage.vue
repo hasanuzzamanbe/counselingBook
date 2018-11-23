@@ -365,6 +365,7 @@ export default {
   border: 1px solid #e7dddd;
   padding: 24px;
   background: #78e0c447;
+  box-shadow: -3px 4px 5px;
 }
 p {
   font-size: 16px;

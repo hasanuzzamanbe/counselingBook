@@ -19,7 +19,7 @@
                 </div>
             </el-col>
         </el-row>
-        <el-tabs type="border-card" v-if="!isLoading">
+        <el-tabs type="border-card" v-if="!isLoading" style="margin-bottom: 43px;">
             <el-tab-pane label="Sign Up as Student">
                 <el-row>
                     <el-col :span="16">

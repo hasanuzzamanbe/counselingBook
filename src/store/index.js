@@ -92,7 +92,6 @@ export const store = new Vuex.Store({
           }
           state.loading = false;
         });
-      console.log(state.onApproveTecWithkey);
     },
     sendCounselRequest({ state }, payload) {
       state.loading = true;

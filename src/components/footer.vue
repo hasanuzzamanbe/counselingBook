@@ -4,8 +4,7 @@
             <el-col :span="12">
                 <div class="grid-content bg-purple">
                     <ul>
-                        <li>Home</li>
-                        <li>contact us</li>
+                        <li @click="homepage" style="cursor: pointer;">Home</li>
                     </ul>
                 </div>
             </el-col>
@@ -21,6 +20,16 @@
         </el-row>
     </div>
 </template>
+<script>
+export default {
+  methods: {
+    homepage() {
+      this.$router.push("/");
+    }
+  }
+};
+</script>
+
 <style scoped>
 div li {
   list-style: none;
