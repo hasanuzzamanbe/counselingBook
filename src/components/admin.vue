@@ -87,18 +87,21 @@
 import * as firebase from "firebase";
 export default {
   data() {
-    return {};
+    return {
+      userIsAdmin: false
+    };
   },
   computed: {
     user() {
       return this.$store.getters.user;
     },
-    userIsAdmin() {
-      let user = this.$store.getters.userId;
-      let Alladmin = this.$store.getters.getAdmins;
+    // userIsAdmin() {
+    // let user = this.$store.getters.userId;
+    // let Alladmin = this.$store.getters.getAdmins;
+    // return Alladmin.indexOf(user) > -1;
 
-      return Alladmin.indexOf(user) > -1;
-    },
+    //   return false;
+    // },
     loadApprovalstec() {
       return this.$store.getters.loadApprovalstec;
     },
@@ -106,13 +109,25 @@ export default {
       return this.$store.getters.loadApprovalsAdmin;
     }
   },
-  watch: {
-    user(value) {
-      if (value !== null && value !== undefined && !userIsAdmin) {
-        this.$router.push("/");
+  mounted: function(value) {
+    let user = this.$store.getters.user;
+    let Alladmin = this.$store.getters.getAdmins;
+    if (user) {
+      if (Alladmin.indexOf(user.id) > -1) {
+        return (this.userIsAdmin = true);
       }
     }
   },
+  beforeUpdate: function(value) {
+    let user = this.$store.getters.user;
+    let Alladmin = this.$store.getters.getAdmins;
+    if (user) {
+      if (Alladmin.indexOf(user.id) > -1) {
+        return (this.userIsAdmin = true);
+      }
+    }
+  },
+
   methods: {
     succesAlert() {
       this.$notify({

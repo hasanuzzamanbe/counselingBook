@@ -134,4 +134,8 @@ export default {
   margin-right: auto;
   width: 26%;
 }
+.el-card__body img.image {
+  min-height: 244px !important;
+  max-height: 244px !important;
+}
 </style>

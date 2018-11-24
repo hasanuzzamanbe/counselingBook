@@ -241,7 +241,7 @@
                                     type="password"
                                     v-model="teacherData.checkPass"
                                     autocomplete="off"
-                                    placeholder="reenter your password"
+                                    placeholder="re-enter your password"
                                 ></el-input>
                             </el-form-item>
                             <el-form-item>

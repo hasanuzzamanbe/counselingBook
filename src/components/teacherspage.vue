@@ -17,16 +17,49 @@
                     <p>Message from teacher: {{teacher.message}}</p>
                 </div>
                 <el-button v-if="isThisTeacher" @click="editDetailsModal=true">Edit details</el-button>
+                <el-button
+                    v-if="isThisTeacher"
+                    @click="uploadImage(teacher.teachersid)"
+                >upload image</el-button>
             </el-col>
+            <el-dialog v-if="uploadModal" :visible.sync="uploadModal">
+                <div>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-upload
+                                class="avatar-uploader"
+                                action="https://jsonplaceholder.typicode.com/posts/"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess"
+                                :before-upload="beforeAvatarUpload"
+                            >
+                                <img v-if="imageUrl" :src="imageUrl" class="avatar">
+                                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                            </el-upload>
+                            <el-button v-if="isThisTeacher" @click="uploadpic">upload image</el-button>
+                        </el-col>
+                        <el-col :span="12" class="imgDetail">
+                            <p>
+                                N.B: Image must be in jpeg format and not exceeds 2 mb with a size of less then 400px.
+                                Image size: 250*228 is the best for use as profile pic
+                            </p>
+                        </el-col>
+                    </el-row>
+                </div>
+            </el-dialog>
             <el-dialog :visible.sync="editDetailsModal" v-if="editDetailsModal">
-                <div v-for="(teacher) in getTeachers" :key="teacher.teachersid">
+                <div v-for="(teacher) in getTeachers" :key="teacher.teachersid" class="modalInputs">
                     <h2>Edit user details from here</h2>
                     <el-input type="text" v-model="teacher.name"></el-input>
                     <el-input type="text" v-model="teacher.subject"></el-input>
                     <el-input type="text" v-model="teacher.time"></el-input>
                     <el-input type="text" v-model="teacher.message"></el-input>
                 </div>
-                <el-button type="success" @click="submiteditDetails(teacher.teachersid)">Save</el-button>
+                <el-button
+                    type="primary"
+                    style="margin-top: 23px;"
+                    @click="submiteditDetails(teacher.teachersid)"
+                >Update Profile</el-button>
             </el-dialog>
             <el-col :span="6">
                 <div class="grid-content bg-purple-light">
@@ -162,6 +195,9 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      imagePathLink: "",
+      imageUrl: "",
+      uploadModal: false,
       teacherData: [],
       TeacherDataKey: [],
       editDetailsModal: false,
@@ -174,7 +210,8 @@ export default {
         studentUidF: "",
         date1: "",
         course: "",
-        status: "on request.."
+        status: "on request..",
+        rawFile: null
       },
       rules: {
         name: [
@@ -249,6 +286,58 @@ export default {
     }
   },
   methods: {
+    uploadImage(idOfTec) {
+      this.uploadModal = true;
+      let allTeacherWithKey = this.$store.getters.keyWithTeacherAll;
+      for (let obj in allTeacherWithKey) {
+        for (let ob in allTeacherWithKey[obj]) {
+          if (allTeacherWithKey[obj][ob] === idOfTec) {
+            this.TeacherDataKey = obj;
+          }
+        }
+      }
+      this.imagePathLink = "teachers" + "/" + this.TeacherDataKey;
+    },
+    uploadpic() {
+      var storageRef = firebase.storage().ref();
+      var mountainsRef = storageRef.child(this.ID);
+      var mountainImagesRef = storageRef.child("images/" + this.ID);
+      let fullData = this.teacherData[0];
+      let imgUrlPath = this.teacherData[0].imageUrl;
+      let newPath = this.imagePathLink;
+      mountainImagesRef.put(this.rawFile).then(function(filedata) {
+        let imagePath = filedata.metadata.fullPath;
+        firebase
+          .storage()
+          .ref()
+          .child(imagePath)
+          .getDownloadURL()
+          .then(data => {
+            fullData.imageUrl = data;
+            firebase
+              .database()
+              .ref(newPath)
+              .set(fullData);
+          });
+      });
+      this.uploadModal = false;
+    },
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.rawFile = file.raw;
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("Avatar picture must be JPG format!");
+      }
+      if (!isLt2M) {
+        this.$message.error("Avatar picture size can not exceed 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
     backtoHome() {
       this.$router.push("/");
     },
@@ -358,6 +447,14 @@ export default {
     margin-top: -35px;
   }
 }
+@media only screen and (max-width: 790px) {
+  .imgDetail {
+    display: none;
+  }
+  .avatar[data-v-7a5c22f0] {
+    width: 138px;
+  }
+}
 .teacherDetails {
   text-decoration: underline;
 }
@@ -390,10 +487,12 @@ h3 {
   border-right: 1px solid #cebaba73;
   padding: 12px;
 }
+.requestFormRow[data-v-7a5c22f0] {
+  color: rgb(217, 9, 41);
+  background-size: cover;
+  background-image: url(/static/img/formback.2c0d7cb.jpg);
+}
 .requestFormRow {
-  /* background-image: url(/static/img/formback.7e7de8c.jpg);
-  background-size: contain; */
-  color: rgb(20, 20, 20);
   margin-top: 20px;
   border: 1px solid #cebaba73;
   padding: 12px;
@@ -428,5 +527,31 @@ input.el-input__inner {
   float: right;
   margin-top: 101px;
   margin-bottom: -69px;
+}
+.el-input {
+  margin-bottom: 7px;
+}
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409eff;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

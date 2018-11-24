@@ -225,7 +225,6 @@ export const store = new Vuex.Store({
             id: user.user.uid
           };
           commit("setUser", newUser);
-
           commit("isloading", false);
         })
         .catch(error => {
@@ -251,6 +250,7 @@ export const store = new Vuex.Store({
           commit("setError", error.code);
           if (error.code) {
             alert(error.code);
+            commit("isloading", false);
           }
         });
     },

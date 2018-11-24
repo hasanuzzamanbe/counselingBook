@@ -1,6 +1,7 @@
 <template>
     <div>
         <el-menu
+            class="stickymenu"
             mode="horizontal"
             background-color="#545c64"
             text-color="#fff"
@@ -12,7 +13,11 @@
                 <i class="el-icon-document"></i>
                 <span slot="title">My Schedules</span>
             </el-menu-item>
-            <el-menu-item @click="MyDashboard" v-if="userIsAuthenticated && isUserTeacher">
+            <el-menu-item
+                index="1-4"
+                @click="MyDashboard"
+                v-if="userIsAuthenticated && isUserTeacher"
+            >
                 <i class="el-icon-document"></i>
                 <span slot="title">My Dashboard</span>
             </el-menu-item>
@@ -29,7 +34,7 @@
                 style="float: right;"
             >Sign Up</el-menu-item>
             <el-menu-item
-                index="1"
+                index="12"
                 v-if="!userIsAuthenticated"
                 @click="SignInPage"
                 style="float: right;"

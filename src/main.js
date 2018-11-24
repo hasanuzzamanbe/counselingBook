@@ -28,7 +28,7 @@ new Vue({
       authDomain: "student-10c1b.firebaseapp.com",
       databaseURL: "https://student-10c1b.firebaseio.com",
       projectId: "student-10c1b",
-      storageBucket: "",
+      storageBucket: "gs://student-10c1b.appspot.com",
       messagingSenderId: "595310467884"
     });
     firebase.auth().onAuthStateChanged(user => {
