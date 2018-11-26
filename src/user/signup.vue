@@ -187,81 +187,6 @@
                     </el-col>
                 </el-row>
             </el-tab-pane>
-            <el-tab-pane label="Sign Up as Admin">
-                <el-row>
-                    <p class="notifySignUp">
-                        <i class="el-icon-info"></i>
-                        Your account will create as default user. And a request will send to the admins
-                        If admin approve you as a admin,
-                        <br>Then your account will be upgrated to admins account
-                    </p>
-                    <el-col :span="16">
-                        <el-form
-                            style="margin-bottom: 60px;"
-                            :model="teacherData"
-                            status-icon
-                            :rules="rules2"
-                            ref="teacherData"
-                            label-width="120px"
-                        >
-                            <el-form-item label="Name">
-                                <el-input
-                                    v-model="teacherData.name"
-                                    placeholder="Enter your Full Name"
-                                    type="text"
-                                ></el-input>
-                            </el-form-item>
-                            <el-form-item label="Email" prop="email">
-                                <el-input
-                                    v-model.number="teacherData.mail"
-                                    placeholder="Enter your email address"
-                                    type="email"
-                                ></el-input>
-                                <span
-                                    v-if="!mailvalidated && !mailBoxnotEmpty"
-                                    style="
-                                  font-size: 12px;
-                                  color: #f56c6c;
-                                  margin-left: 1px;
-                                  position: absolute;
-                                  margin-top: -12px;
-                             "
-                                >*please input a valid email address (required)</span>
-                            </el-form-item>
-                            <el-form-item label="Password" prop="pass">
-                                <el-input
-                                    type="password"
-                                    v-model="teacherData.pass"
-                                    autocomplete="off"
-                                    placeholder="Enter a password"
-                                ></el-input>
-                            </el-form-item>
-                            <el-form-item label="Confirm" prop="checkPass">
-                                <el-input
-                                    type="password"
-                                    v-model="teacherData.checkPass"
-                                    autocomplete="off"
-                                    placeholder="re-enter your password"
-                                ></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button
-                                    type="primary"
-                                    @click="onSignUpAdmin()"
-                                    size="small"
-                                    :disabled="!mailvalidated || !passValidateAdmin"
-                                >Sign Up</el-button>
-                                <p>Already have an account ?
-                                    <el-button type="text" @click="redirectSignin">sign In</el-button>.
-                                </p>
-                                <p style="margin-top: -27px;">Forgot your password ?
-                                    <el-button type="text" @click="forgotPass=true">Forgot Password</el-button>.
-                                </p>
-                            </el-form-item>
-                        </el-form>
-                    </el-col>
-                </el-row>
-            </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -407,14 +332,7 @@ export default {
       this.$store.dispatch("signUserUp", this.teacherData);
       this.AlertAdminTeacher();
     },
-    onSignUpAdmin() {
-      this.$store.dispatch("signUserUpadmin", {
-        name: this.teacherData.name,
-        mail: this.teacherData.mail,
-        pass: this.teacherData.pass
-      });
-      this.AlertAdminTeacher();
-    },
+
     onSignUpStudent() {
       this.$store.dispatch("signUserUpStudent", {
         mail: this.teacherData.mail,

@@ -5,6 +5,7 @@ import * as firebase from "firebase";
 Vue.use(Vuex);
 export const store = new Vuex.Store({
   state: {
+    adminsTxt: [],
     onApproveAdminWithkey: [],
     onApproveTecWithkey: [],
     approvalAdmin: [],
@@ -17,7 +18,8 @@ export const store = new Vuex.Store({
     teachers: [],
     goToTeacher: {},
     schedules: [],
-    requestFromSt: []
+    requestFromSt: [],
+    minTime: 7
   },
 
   mutations: {
@@ -47,6 +49,13 @@ export const store = new Vuex.Store({
             state.requestFromSt.push(requestData[i]);
           }
           state.loading = false;
+        });
+      firebase
+        .database()
+        .ref("minEditTime")
+        .once("value")
+        .then(data => {
+          state.minTime = Number(data.val());
         });
     },
     loadDataOfTeacher({ state }) {
@@ -91,6 +100,16 @@ export const store = new Vuex.Store({
             state.approvalTech.push(requestData[i]);
           }
           state.loading = false;
+        });
+      firebase
+        .database()
+        .ref("txtToAdmin")
+        .once("value")
+        .then(data => {
+          let allData = data.val();
+          for (let m in allData) {
+            state.adminsTxt.push(allData[m]);
+          }
         });
     },
     sendCounselRequest({ state }, payload) {
@@ -316,6 +335,12 @@ export const store = new Vuex.Store({
     },
     getDataOnapproveWithKeyTec(state) {
       return state.onApproveTecWithkey;
+    },
+    MinTimeToEdit(state) {
+      return state.minTime;
+    },
+    messageToAdmin(state) {
+      return state.adminsTxt;
     }
   }
 });

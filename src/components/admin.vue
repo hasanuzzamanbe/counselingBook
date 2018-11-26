@@ -1,8 +1,31 @@
 <template>
     <div class="mainDiv">
-        <h3>Admin page :</h3>
-        <h4>Add a teacher (admin only)</h4>
+        <h2 v-if="userIsAdmin" style="color:red;text-decoration:underline">Admin page :</h2>
+        <h4 v-if="userIsAdmin">Settings:</h4>
         <hr>
+        <div v-if="userIsAdmin">
+            <el-row>
+                <p style="text-decoration:underline">Profile Edit limitation:</p>
+                <p
+                    class="howToAdd"
+                >please enter the day in number that a teacher can edit their profile after that day of previous edit</p>
+                <el-input
+                    type="number"
+                    size="mini"
+                    placeholder="No of"
+                    v-model="minDayOfEdit"
+                    max="100"
+                    min="-1"
+                    style=" max-width:100px"
+                ></el-input>Days
+                <el-button type="primary" @click="submitMinDay" size="mini">Update</el-button>
+            </el-row>
+            <el-row style="margin-top: 12px;">clear limitation (Can edit as many as wish)
+                <el-button @click="nolimit" type="warning" size="mini">clear</el-button>
+            </el-row>
+        </div>
+        <h4 style="margin-top:43px" v-if="userIsAdmin">Add a teacher (admin only)</h4>
+        <hr v-if="userIsAdmin">
         <div v-if="userIsAdmin">
             <p
                 class="howToAdd"
@@ -46,11 +69,84 @@
         </div>
         <hr style="margin-top:50px">
         <div v-if="userIsAdmin">
-            <h2>Add another admin</h2>
+            <h3>Add another admin</h3>
             <p
                 class="howToAdd"
             >The requested admin are listed bellow add as a new admin or cancel his/her request</p>
         </div>
+        <el-button
+            v-if="userIsAdmin"
+            @click="adminmodal=true"
+            style="margin-bottom:32px"
+        >Add an Admin +</el-button>
+        <el-dialog :visible.sync="adminmodal" v-if="adminmodal">
+            <el-row>
+                <p class="notifySignUp">
+                    <i class="el-icon-info"></i>
+                    Your account will create as default user. And a request will send to the admins
+                    If admin approve you as a admin,
+                    <br>Then your account will be upgrated to admins account
+                </p>
+                <el-col :span="16">
+                    <el-form
+                        style="margin-bottom: 60px;"
+                        :model="teacherData"
+                        status-icon
+                        ref="teacherData"
+                        label-width="120px"
+                    >
+                        <el-form-item label="Name">
+                            <el-input
+                                v-model="teacherData.name"
+                                placeholder="Enter your Full Name"
+                                type="text"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item label="Email" prop="email">
+                            <el-input
+                                v-model.number="teacherData.mail"
+                                placeholder="Enter your email address"
+                                type="email"
+                            ></el-input>
+                            <span
+                                v-if="!mailvalidated && !mailBoxnotEmpty"
+                                style="
+                                  font-size: 12px;
+                                  color: #f56c6c;
+                                  margin-left: 1px;
+                                  position: absolute;
+                                  margin-top: -12px;
+                             "
+                            >*please input a valid email address (required)</span>
+                        </el-form-item>
+                        <el-form-item label="Password" prop="pass">
+                            <el-input
+                                type="password"
+                                v-model="teacherData.pass"
+                                autocomplete="off"
+                                placeholder="Enter a password"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item label="Confirm" prop="checkPass">
+                            <el-input
+                                type="password"
+                                v-model="teacherData.checkPass"
+                                autocomplete="off"
+                                placeholder="re-enter your password"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button
+                                type="primary"
+                                @click="onSignUpAdmin()"
+                                size="small"
+                                :disabled="!mailvalidated || !passValidateAdmin"
+                            >Sign Up</el-button>
+                        </el-form-item>
+                    </el-form>
+                </el-col>
+            </el-row>
+        </el-dialog>
         <el-row
             v-if="userIsAdmin"
             class="AdminDetailRow"
@@ -88,20 +184,38 @@ import * as firebase from "firebase";
 export default {
   data() {
     return {
+      minDayOfEdit: "",
+      adminmodal: false,
+      teacherData: {
+        name: "",
+        mail: "",
+        pass: "",
+        checkPass: ""
+      },
       userIsAdmin: false
     };
   },
   computed: {
+    mailvalidated() {
+      return this.validateEmail(this.teacherData.mail);
+    },
+    mailvalidatedForgotPass() {
+      return this.validateEmail(this.forgotPassMail);
+    },
+    mailBoxnotEmpty() {
+      return this.teacherData.mail !== " ";
+    },
     user() {
       return this.$store.getters.user;
     },
-    // userIsAdmin() {
-    // let user = this.$store.getters.userId;
-    // let Alladmin = this.$store.getters.getAdmins;
-    // return Alladmin.indexOf(user) > -1;
-
-    //   return false;
-    // },
+    passValidateAdmin() {
+      return (
+        this.teacherData.pass !== "" &&
+        this.teacherData.pass.length >= 6 &&
+        this.teacherData.pass === this.teacherData.checkPass &&
+        this.teacherData.name !== ""
+      );
+    },
     loadApprovalstec() {
       return this.$store.getters.loadApprovalstec;
     },
@@ -129,6 +243,30 @@ export default {
   },
 
   methods: {
+    nolimit() {
+      this.minDayOfEdit = -1;
+      this.submitMinDay();
+    },
+    onSignUpAdmin() {
+      this.$store.dispatch("signUserUpadmin", {
+        name: this.teacherData.name,
+        mail: this.teacherData.mail,
+        pass: this.teacherData.pass
+      });
+    },
+    submitMinDay() {
+      firebase
+        .database()
+        .ref("minEditTime")
+        .set(this.minDayOfEdit)
+        .then(data => {
+          alert("updated");
+        });
+    },
+    validateEmail(email) {
+      var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+      return re.test(String(email).toLowerCase());
+    },
     succesAlert() {
       this.$notify({
         title: "Success",
@@ -254,11 +392,6 @@ export default {
       let index = this.loadApprovalstec.indexOf(locData);
       this.loadApprovalstec.splice(index, 1);
     },
-    // AddAdmin() {
-    //   this.$store.dispatch("makeAnAdmin", this.adminId);
-    //   this.adminId = "";
-    // },
-
     goBack() {
       this.$router.push("/");
     }
@@ -272,7 +405,7 @@ p.howToAdd {
   font-family: monospace;
   font-size: 14px;
   line-height: 30px;
-  margin-bottom: 53px;
+  margin-bottom: 22px;
 }
 input.el-input__inner {
   margin-bottom: 14px;
@@ -303,8 +436,7 @@ input.el-input__inner {
   background-color: #da1f1fe6;
   color: white;
   border-radius: 12px;
-  -webkit-box-shadow: 2px 2px 2px;
-  box-shadow: 4px 7px 8px #484040;
+  box-shadow: 2px 2px 2px black;
   margin-bottom: 23px;
 }
 button.el-button {

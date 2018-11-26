@@ -8,6 +8,30 @@
                 </div>
             </el-col>
         </el-row>
+        <el-dialog :visible.sync="notPossibleToEdit" v-if="notPossibleToEdit">
+            <p>You Are not able to edit details before {{this.afterDays}} days</p>
+            <p>If Its urgent You can request to an admin. please type your text bellow and press "Request to admin" button</p>
+            <el-input
+                style="margin-bottom: 13px;"
+                type="text"
+                v-model="requestAdmintxt"
+                placeholder="Type your text"
+            ></el-input>
+            <el-row>
+                <el-button-group>
+                    <el-button
+                        type="success"
+                        size="mini"
+                        @click="notPossibleToEdit=false"
+                    >Its Ok for now</el-button>
+                    <el-button
+                        type="primary"
+                        size="mini"
+                        @click="SendrequestAdmintxt"
+                    >Request to admin</el-button>
+                </el-button-group>
+            </el-row>
+        </el-dialog>
         <el-row class="teacherDetailRow" v-for="teacher in getTeachers" :key="teacher.teachersid">
             <el-col :span="18">
                 <div class="grid-content bg-purple">
@@ -16,7 +40,7 @@
                     <p>Available time:{{teacher.time}}</p>
                     <p>Message from teacher: {{teacher.message}}</p>
                 </div>
-                <el-button v-if="isThisTeacher" @click="editDetailsModal=true">Edit details</el-button>
+                <el-button v-if="isThisTeacher" @click="checkEditRequest">Edit details</el-button>
                 <el-button
                     v-if="isThisTeacher"
                     @click="uploadImage(teacher.teachersid)"
@@ -195,6 +219,9 @@ export default {
   props: ["teachersid", "ID"],
   data() {
     return {
+      requestAdmintxt: "",
+      afterDays: "",
+      notPossibleToEdit: false,
       imagePathLink: "",
       imageUrl: "",
       uploadModal: false,
@@ -286,6 +313,37 @@ export default {
     }
   },
   methods: {
+    SendrequestAdmintxt() {
+      let txt = {};
+      txt.name = this.getTeachers[0].name;
+      txt.mail = this.getTeachers[0].mail;
+      txt.msg = this.requestAdmintxt;
+      firebase
+        .database()
+        .ref("txtToAdmin")
+        .push(txt);
+      this.notPossibleToEdit = false;
+      alert("success");
+    },
+    checkEditRequest() {
+      let mintime = this.$store.getters.MinTimeToEdit;
+      let lastTimeOfEdit = this.getTeachers[0].lastEditat;
+      let d = new Date();
+      let nowTime = d.getTime();
+      var timeDiff = Math.abs(nowTime - lastTimeOfEdit);
+      var diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24)) - 1;
+      if (lastTimeOfEdit === null || lastTimeOfEdit === undefined) {
+        this.editDetailsModal = true;
+      } else {
+        if (diffDays <= mintime) {
+          this.afterDays = mintime - diffDays;
+          this.notPossibleToEdit = true;
+        } else {
+          this.editDetailsModal = true;
+        }
+      }
+    },
+
     uploadImage(idOfTec) {
       this.uploadModal = true;
       let allTeacherWithKey = this.$store.getters.keyWithTeacherAll;
@@ -350,6 +408,9 @@ export default {
           }
         }
       }
+      var currentDate = new Date();
+      var currentMili = currentDate.getTime();
+      this.getTeachers[0].lastEditat = currentMili;
       let path = "teachers" + "/" + this.TeacherDataKey;
       firebase
         .database()

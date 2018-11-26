@@ -7,6 +7,8 @@ import SignIN from "@/user/signin";
 import SignUp from "@/user/signup";
 import Admin from "@/components/admin";
 import Schedules from "@/components/schedules";
+import Messages from "@/components/messages.vue";
+
 Vue.use(Router);
 
 export default new Router({
@@ -46,6 +48,11 @@ export default new Router({
       path: "/adminpanel",
       name: "adminpanel",
       component: Admin
+    },
+    {
+      path: "/messages",
+      name: "Messages",
+      component: Messages
     }
   ]
 });

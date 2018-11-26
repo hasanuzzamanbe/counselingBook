@@ -8,8 +8,13 @@
             active-text-color="#ffd04b"
         >
             <el-menu-item index="1" @click="TeachersPage">All Teachers</el-menu-item>
-            <el-menu-item index="1-1" @click="adminonly" v-if="userIsAuthenticated">Admin Panel</el-menu-item>
-            <el-menu-item index="3" @click="Schedules" v-if="userIsAuthenticated && !isUserTeacher">
+            <el-menu-item index="1-1" @click="adminonly" v-if="userIsAdmin">Admin Panel</el-menu-item>
+            <el-menu-item index="5" v-if="userIsAdmin" @click="Messages">Messages</el-menu-item>
+            <el-menu-item
+                index="3"
+                @click="Schedules"
+                v-if="userIsAuthenticated && !isUserTeacher && !userIsAdmin"
+            >
                 <i class="el-icon-document"></i>
                 <span slot="title">My Schedules</span>
             </el-menu-item>
@@ -117,8 +122,18 @@ export default {
         this.$store.getters.user !== null &&
         this.$store.getters.user !== undefined
       );
+    },
+    userIsAdmin() {
+      let user = this.$store.getters.user;
+      let Alladmin = this.$store.getters.getAdmins;
+      if (user) {
+        if (Alladmin.indexOf(user.id) > -1) {
+          return true;
+        }
+      }
     }
   },
+
   methods: {
     adminonly() {
       this.$router.push("/adminpanel");
@@ -148,6 +163,9 @@ export default {
       let getuserId = this.$store.getters.userId;
       let path = "/teacher/" + getuserId;
       this.$router.push(path);
+    },
+    Messages() {
+      this.$router.push("/messages");
     }
   }
 };
