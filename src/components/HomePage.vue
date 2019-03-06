@@ -12,7 +12,7 @@ i
             </el-col>
         </el-row>
         <el-row>
-            <el-col :span="6" v-for="(t, index) in teachers" :key="index">
+            <el-col class="cardBodyMain" :span="6" v-for="(t, index) in teachers" :key="index">
                 <el-card class="cardBody" :body-style="{ padding: '0px' }">
                     <img :src="t.imageUrl" class="image">
                     <div style="padding: 14px;">

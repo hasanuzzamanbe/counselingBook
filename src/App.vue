@@ -20,6 +20,10 @@ export default {
 </script>
 
 <style>
+  .cardBodyMain {
+    width: 25%;
+    min-width: 228px !important;
+  }
 #app {
   background: #fbfafa;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
