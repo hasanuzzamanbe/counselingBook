@@ -1,5 +1,5 @@
 <template>
-    <div id="app" style="max-width:1785px;margin-top: -23px;">
+    <div id="app" style="margin-top: -23px;">
         <AppHeader/>
         <!-- <img src="./assets/logo.png"> -->
         <router-view/>
@@ -35,6 +35,9 @@ export default {
     padding-left: 106px;
     padding-top: 16px;
   }
+}
+.el-carousel__container {
+  background: #1d545acf;
 }
 .loadImgHome {
   display: block;

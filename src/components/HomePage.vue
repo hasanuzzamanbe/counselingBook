@@ -1,6 +1,6 @@
 i
 <template>
-    <div style="padding: 20px;    padding-left: 70px; max-width:1785px">
+    <div style="padding: 20px;    padding-left: 70px;">
         <div class="firstHeader">
             <h3>OUR HONURABLE TEACHERS</h3>
         </div>
