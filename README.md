@@ -21,7 +21,7 @@ Admin has all the access to add a new admin or student. Admin will notify for an
 ## BackEnd used :
   Firebase
 ## Thanks to all:
-  Hope you all enjoy my first project. <br>If you have any suggestion I really appreciate you. Please Just Let me know about it.
+  Hope you all enjoy my project. <br>If you have any suggestion I really appreciate you. Please Just Let me know about it.
   You can mail me at:
   hasanuzzamanbe@gmail.com
   
