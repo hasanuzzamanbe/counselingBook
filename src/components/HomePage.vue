@@ -11,7 +11,7 @@ i
                 </div>
             </el-col>
         </el-row>
-        <el-row>
+        <el-row style="display: flex; flex-wrap: wrap;">
             <el-col class="cardBodyMain" :span="6" v-for="(t, index) in teachers" :key="index">
                 <el-card class="cardBody" :body-style="{ padding: '0px' }">
                     <img :src="t.imageUrl" class="image">
