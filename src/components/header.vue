@@ -69,7 +69,7 @@
                         </span>
                     </p>
                 </div>
-                <img style="min-width: 1781px;" src="@/assets/headerimg.jpg" alt="">
+                <img style="min-width: 100%;" src="@/assets/headerimg.jpg" alt="">
             </el-carousel-item>
             <el-carousel-item>
                 <div class="caroInnerText">
@@ -88,7 +88,7 @@
                         </span>
                     </p>
                 </div>
-                <img style="min-width: 1781px;" src="@/assets/caroseul1c.jpg" alt="">
+                <img style="min-width: 100%;" src="@/assets/caroseul1c.jpg" alt="">
             </el-carousel-item>
         </el-carousel>
     </div>
