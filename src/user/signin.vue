@@ -43,7 +43,6 @@
                                   font-size: 12px;
                                   color: rgba(44, 62, 80, 0.58);
                                   margin-left: 1px;
-                                  position: absolute;
                                   margin-top: -32px;
                              "
                         >*please input a valid email address (required)</span>

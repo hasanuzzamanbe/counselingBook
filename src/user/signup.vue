@@ -59,7 +59,6 @@
                                   font-size: 12px;
                                   color: #f56c6c;
                                   margin-left: 1px;
-                                  position: absolute;
                                   margin-top: -12px;
                              "
                                 >*please input a valid email address (required)</span>
@@ -148,7 +147,6 @@
                                   font-size: 12px;
                                   color: #f56c6c;
                                   margin-left: 1px;
-                                  position: absolute;
                                   margin-top: -12px;
                              "
                                 >*please input a valid email address (required)</span>
