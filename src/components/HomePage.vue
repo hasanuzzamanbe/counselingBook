@@ -1,6 +1,6 @@
 i
 <template>
-    <div style="padding: 20px;    padding-left: 70px;">
+    <div class="cb_home-page-main-content">
         <div class="firstHeader">
             <h3>OUR HONURABLE TEACHERS</h3>
         </div>
@@ -137,5 +137,13 @@ export default {
 .el-card__body img.image {
   min-height: 244px !important;
   max-height: 244px !important;
+}
+.cb_home-page-main-content {
+  padding: 20px 20px 20px 70px;
+}
+@media screen and (max-width: 1047px) and (min-width: 960px) {
+ .cb_home-page-main-content {
+    padding: 0px;
+  }
 }
 </style>
