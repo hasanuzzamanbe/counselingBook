@@ -44,6 +44,6 @@ For a detailed explanation on how things work, check out the [guide](http://vuej
   or
   
   Facebook:
-  https://www.facebook.com/shamim.reza.1029
+  https://www.facebook.com/shamim0902
 
 
