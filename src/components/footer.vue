@@ -12,7 +12,7 @@
                 <div class="grid-content bg-purple-light rightFot">
                     @copyright
                     <a
-                        href="mailto:hasanuzzamanbe@gmail.com"
+                        href="https://www.hasanuzzaman.com"
                         style="    color: indianred;"
                     >Hasanuzzaman</a>
                 </div>
